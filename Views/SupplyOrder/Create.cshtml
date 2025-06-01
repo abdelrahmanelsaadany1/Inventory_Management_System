@@ -1,0 +1,138 @@
+﻿@model Inventory_Management_System.ViewModels.AddSupplyOrderViewModel
+
+@{
+    ViewData["Title"] = "Create Supply Order";
+}
+
+<h2>Create Supply Order</h2>
+
+<!-- Add validation summary to see all errors -->
+<div asp-validation-summary="All" class="text-danger"></div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="OrderNumber"></label>
+        <input asp-for="OrderNumber" class="form-control" />
+        <span asp-validation-for="OrderNumber" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="OrderDate"></label>
+        <input asp-for="OrderDate" class="form-control" type="date" />
+        <span asp-validation-for="OrderDate" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="WarehouseId"></label>
+        <select asp-for="WarehouseId" asp-items="@(new SelectList(Model.Warehouses, "Id", "Name"))" class="form-control">
+            <option value="">-- Select Warehouse --</option>
+        </select>
+        <span asp-validation-for="WarehouseId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="SupplierId"></label>
+        <select asp-for="SupplierId" asp-items="@(new SelectList(Model.Suppliers, "Id", "Name"))" class="form-control">
+            <option value="">-- Select Supplier --</option>
+        </select>
+        <span asp-validation-for="SupplierId" class="text-danger"></span>
+    </div>
+
+    <h4>Items</h4>
+    <table class="table" id="items-table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Production Date</th>
+                <th>Expiry (Days)</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Items.Count; i++)
+            {
+                <tr>
+                    <td>
+                        <select asp-for="@Model.Items[i].ProductId" asp-items="@(new SelectList(Model.Products, "Id", "Name"))" class="form-control">
+                            <option value="">-- Select --</option>
+                        </select>
+                        <span asp-validation-for="@Model.Items[i].ProductId" class="text-danger"></span>
+                    </td>
+                    <td>
+                        <input asp-for="@Model.Items[i].Quantity" class="form-control" />
+                        <span asp-validation-for="@Model.Items[i].Quantity" class="text-danger"></span>
+                    </td>
+                    <td>
+                        <input asp-for="@Model.Items[i].ProductionDate" class="form-control" type="date" />
+                        <span asp-validation-for="@Model.Items[i].ProductionDate" class="text-danger"></span>
+                    </td>
+                    <td>
+                        <input asp-for="@Model.Items[i].ExpiryPeriodInDays" class="form-control" />
+                        <span asp-validation-for="@Model.Items[i].ExpiryPeriodInDays" class="text-danger"></span>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger" onclick="removeRow(this)">Remove</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button type="button" class="btn btn-secondary" onclick="addRow()">Add Item</button>
+    <br /><br />
+
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        let productList = @Html.Raw(Json.Serialize(Model.Products));
+
+        function addRow() {
+            let index = document.querySelectorAll("#items-table tbody tr").length;
+            let row = `
+<tr>
+    <td>
+        <select name="Items[${index}].ProductId" class="form-control">
+            <option value="">-- Select --</option>
+            ${productList.map(p => `<option value="${p.Id}">${p.Name}</option>`).join('')}
+        </select>
+    </td>
+    <td><input name="Items[${index}].Quantity" class="form-control" /></td>
+    <td><input name="Items[${index}].ProductionDate" class="form-control" type="date" /></td>
+    <td><input name="Items[${index}].ExpiryPeriodInDays" class="form-control" /></td>
+    <td><button type="button" class="btn btn-danger" onclick="removeRow(this)">Remove</button></td>
+</tr>`;
+            document.querySelector("#items-table tbody").insertAdjacentHTML("beforeend", row);
+        }
+
+        function removeRow(button) {
+            let tbody = button.closest("tbody");
+            button.closest("tr").remove();
+            
+            // Re-index remaining rows
+            let rows = tbody.querySelectorAll("tr");
+            rows.forEach((row, index) => {
+                row.querySelectorAll("select, input").forEach(element => {
+                    if (element.name) {
+                        element.name = element.name.replace(/\[\d+\]/, `[${index}]`);
+                    }
+                });
+            });
+        }
+
+        // Debug form submission
+        document.querySelector('form').addEventListener('submit', function(e) {
+            console.log('Form submitting...');
+            console.log('Form data:', new FormData(this));
+        });
+    </script>
+}

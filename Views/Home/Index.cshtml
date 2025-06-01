@@ -1,0 +1,177 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<style>
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        font-family: 'Inter', sans-serif;
+        margin: 0;
+        padding: 2rem;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    h1 {
+        color: white;
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .subtitle {
+        color: rgba(255,255,255,0.9);
+        font-size: 1.2rem;
+        margin-bottom: 3rem;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .card {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        padding: 2rem;
+        border: 1px solid rgba(255,255,255,0.2);
+        transition: transform 0.3s ease;
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h2 {
+            color: white;
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+    .icon {
+        background: linear-gradient(45deg, #fbbf24, #f59e0b);
+        width: 20px;
+        height: 20px;
+        border-radius: 6px;
+        font-size: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+    }
+
+    .btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 1rem;
+        color: white;
+        text-decoration: none;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            text-decoration: none;
+            color: white;
+        }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+        }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #6b7280, #4b5563);
+    }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #5b6470, #374151);
+        }
+
+</style>
+
+<div class="container">
+    <h1>Inventory Management System</h1>
+    <p class="subtitle">Streamline your warehouse operations</p>
+
+    <div class="grid">
+        <div class="card">
+            <h2><span class="icon">📦</span>Core Operations</h2>
+            <div class="btn-grid">
+                <a href="@Url.Action("Index", "Warehouse")" class="btn btn-primary">
+                    🏪 Warehouses
+                </a>
+                <a href="@Url.Action("Index", "Product")" class="btn btn-primary">
+                    📦 Products
+                </a>
+                <a href="@Url.Action("Index", "Supplier")" class="btn btn-primary">
+                    🚚 Suppliers
+                </a>
+                <a href="@Url.Action("Index", "Customer")" class="btn btn-primary">
+                    👥 Customers
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2><span class="icon">📋</span>Order Management</h2>
+            <div class="btn-grid">
+                <a href="@Url.Action("Index", "SupplyOrder")" class="btn btn-primary">
+                    📥 Supply Orders
+                </a>
+                <a href="@Url.Action("Index", "ReleaseOrder")" class="btn btn-primary">
+                    📤 Release Orders
+                </a>
+                <a href="@Url.Action("Index", "ProductTransfer")" class="btn btn-primary">
+                    🔄 Transfers
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2><span class="icon">📊</span>Analytics & Reports</h2>
+        <div class="btn-grid">
+            <a href="@Url.Action("Index", "WarehouseReport")" class="btn btn-secondary">
+                🏪 Warehouse Reports
+            </a>
+            <a href="@Url.Action("Index", "ProductReport")" class="btn btn-secondary">
+                📦 Product Reports
+            </a>
+            <a href="@Url.Action("Index", "MovementReport")" class="btn btn-secondary">
+                📈 Movement Reports
+            </a>
+            <a href="@Url.Action("Index", "AgedInventoryReport")" class="btn btn-secondary">
+                ⏰ Aged Inventory
+            </a>
+            <a href="@Url.Action("Index", "ExpiryReport")" class="btn btn-secondary">
+                ⚠️ Expiry Reports
+            </a>
+        </div>
+    </div>
+</div>

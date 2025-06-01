@@ -1,0 +1,36 @@
+﻿@model IEnumerable<Inventory_Management_System.Models.Warehouse>
+
+@{
+    ViewData["Title"] = "Warehouse List";
+}
+
+<h2>Warehouse List</h2>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Address</th>
+            <th>Created At</th>
+            <th>Updated At</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var warehouse in Model)
+        {
+            <tr>
+                <td>@warehouse.Name</td>
+                <td>@warehouse.Address</td>
+                <td>@warehouse.CreatedAt.ToString("yyyy-MM-dd")</td>
+                <td>@(warehouse.UpdatedAt.HasValue ? warehouse.UpdatedAt.Value.ToString("yyyy-MM-dd") : "-")</td>
+                <td>
+                    <a class="btn btn-sm btn-primary" href="@Url.Action("Edit", "Warehouse", new { id = warehouse.Id })">Edit</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a class="btn btn-success" href="@Url.Action("Add", "Warehouse")">Add New Warehouse</a>
+<a class="btn btn-success ms-2" href="@Url.Action("Index", "Home")">Back</a>

@@ -1,0 +1,36 @@
+﻿@model List<Inventory_Management_System.Models.Product>
+@{
+    ViewData["Title"] = "All Products";
+}
+
+<h2 class="mb-3">All Products</h2>
+
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Code</th>
+            <th>Name</th>
+            <th>Created At</th>
+            <th>Updated At</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Code</td>
+                <td>@item.Name</td>
+                <td>@item.CreatedAt.ToShortDateString()</td>
+                <td>@(item.UpdatedAt?.ToShortDateString() ?? "-")</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary btn-sm">Edit</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a class="btn btn-success" href="@Url.Action("Add", "Product")">Add New Product</a>
+<a class="btn btn-success ms-2" href="@Url.Action("Index", "Home")">Back</a>

@@ -1,0 +1,45 @@
+﻿@model IEnumerable<Inventory_Management_System.Models.Supplier>
+
+@{
+    ViewData["Title"] = "Suppliers List";
+}
+
+<h2>Suppliers</h2>
+
+
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Mobile</th>
+            <th>Email</th>
+            <th>Website</th>
+            <th>Created At</th>
+            <th>Updated At</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var supplier in Model)
+        {
+            <tr>
+                <td>@supplier.Name</td>
+                <td>@supplier.Phone</td>
+                <td>@supplier.Mobile</td>
+                <td>@supplier.Email</td>
+                <td>@supplier.Website</td>
+                <td>@supplier.CreatedAt.ToString("yyyy-MM-dd")</td>
+                <td>@(supplier.UpdatedAt.HasValue ? supplier.UpdatedAt.Value.ToString("yyyy-MM-dd") : "-")</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@supplier.Id" class="btn btn-primary btn-sm">Edit</a>
+                </td>
+            </tr>
+        }
+      
+    </tbody>
+
+</table>
+<a class="btn btn-success" href="@Url.Action("Add", "Supplier")">Add New Supplier</a>
+<a class="btn btn-success ms-2" href="@Url.Action("Index", "Home")">Back</a>

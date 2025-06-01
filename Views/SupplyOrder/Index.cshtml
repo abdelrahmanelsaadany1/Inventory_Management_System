@@ -1,0 +1,198 @@
+﻿@model IEnumerable<Inventory_Management_System.Models.SupplyOrder>
+
+@{
+    ViewData["Title"] = "Supply Orders";
+}
+
+<h2>Supply Orders</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">+ Add New Supply Order</a>
+</p>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        No supply orders found.
+    </div>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Order Number</th>
+                <th>Order Date</th>
+                <th>Warehouse</th>
+                <th>Supplier</th>
+                <th>Items Count</th>
+                <th>Total Quantity</th>
+                <th>Production Date</th>
+                <th>Expiry Status</th>
+                <th>Created At</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in Model)
+            {
+                <tr>
+                    <td>
+                        <strong>@order.OrderNumber</strong>
+                    </td>
+                    <td>@order.OrderDate.ToShortDateString()</td>
+                    <td>
+                        <span class="badge badge-info">@order.Warehouse?.Name</span>
+                    </td>
+                    <td>
+                        <span class="badge badge-secondary">@order.Supplier?.Name</span>
+                    </td>
+                    <td>
+                        <span class="badge badge-primary">@order.Items?.Count()</span>
+                    </td>
+                    <td>
+                        <span class="badge badge-success">@order.Items?.Sum(i => i.Quantity)</span>
+                    </td>
+                    <td>
+                        @if (order.Items?.Any() == true)
+                        {
+                            var earliestProduction = order.Items.Min(i => i.ProductionDate);
+                            @earliestProduction.ToShortDateString()
+                            @if (order.Items.Count() > 1)
+                            {
+                                <br><small class="text-muted">(+ @(order.Items.Count() - 1) more)</small>
+                            }
+                        }
+                        else
+                        {
+                            <span class="text-muted">N/A</span>
+                        }
+                    </td>
+                    <td>
+                        @if (order.Items?.Any() == true)
+                        {
+                            var expiredCount = 0;
+                            var criticalCount = 0;
+                            var warningCount = 0;
+                            var goodCount = 0;
+
+                            foreach (var item in order.Items)
+                            {
+                                var expectedExpiry = item.ProductionDate.AddDays(item.ExpiryPeriodInDays);
+                                var daysUntilExpiry = (expectedExpiry - DateTime.Today).Days;
+                                
+                                if (daysUntilExpiry < 0)
+                                    expiredCount++;
+                                else if (daysUntilExpiry < 7)
+                                    criticalCount++;
+                                else if (daysUntilExpiry < 30)
+                                    warningCount++;
+                                else
+                                    goodCount++;
+                            }
+
+                            if (expiredCount > 0)
+                            {
+                                <span class="badge badge-danger">@expiredCount Expired</span>
+                            }
+                            if (criticalCount > 0)
+                            {
+                                <span class="badge badge-warning">@criticalCount Critical</span>
+                            }
+                            if (warningCount > 0)
+                            {
+                                <span class="badge badge-warning">@warningCount Warning</span>
+                            }
+                            if (goodCount > 0)
+                            {
+                                <span class="badge badge-success">@goodCount Good</span>
+                            }
+                        }
+                        else
+                        {
+                            <span class="text-muted">N/A</span>
+                        }
+                    </td>
+                    <td>
+                        @order.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                    </td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <a asp-action="Details" asp-route-id="@order.Id" class="btn btn-sm btn-info" title="View Details">
+                                View
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@order.Id" class="btn btn-sm btn-warning" title="Edit">
+                                Edit
+                            </a>
+                            <button type="button" class="btn btn-sm btn-danger" title="Delete" 
+                                    onclick="confirmDelete(@order.Id, '@order.OrderNumber')">
+                                Delete
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete supply order <strong id="orderToDelete"></strong>?</p>
+                <p class="text-danger"><small>This action cannot be undone.</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Delete confirmation
+        function confirmDelete(orderId, orderNumber) {
+            document.getElementById('orderToDelete').textContent = orderNumber;
+            document.getElementById('deleteForm').action = '@Url.Action("Delete")/' + orderId;
+            $('#deleteModal').modal('show');
+        }
+
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            $('.alert').fadeOut();
+        }, 5000);
+    </script>
+}

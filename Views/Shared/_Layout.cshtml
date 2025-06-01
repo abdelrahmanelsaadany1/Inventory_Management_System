@@ -1,0 +1,129 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Inventory Management System</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Inventory_Management_System.styles.css" asp-append-version="true" />
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+        }
+
+        .main-container {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            margin: 2rem auto;
+            max-width: 1200px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: none;
+        }
+
+        main {
+            color: white;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            color: white;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .btn:not(.btn-primary):not(.btn-secondary) {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        }
+
+        .table {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+
+            .table th {
+                background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+                border-color: rgba(255,255,255,0.3);
+                color: white;
+                font-weight: 600;
+                padding: 1rem;
+                border-top: none;
+            }
+
+            .table td {
+                color:white;
+                border-color: rgba(255,255,255,0.1);
+                padding: 0.75rem 1rem;
+                vertical-align: middle;
+            }
+
+            .table tbody tr {
+                background: rgba(255,255,255,0.1);
+                transition: all 0.3s ease;
+            }
+
+                .table tbody tr:hover {
+                    background: rgba(255,255,255,0.15);
+                    transform: scale(1.01);
+                }
+
+        .form-control {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+        }
+
+            .form-control:focus {
+                background: rgba(255,255,255,0.15);
+                border-color: rgba(255,255,255,0.5);
+                color: white;
+                box-shadow: 0 0 0 0.2rem rgba(255,255,255,0.25);
+            }
+
+            .form-control::placeholder {
+                color: rgba(255,255,255,0.7);
+            }
+
+        .form-label {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-container">
+            <main role="main" class="pb-3">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
