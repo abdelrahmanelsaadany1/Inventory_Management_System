@@ -1,0 +1,99 @@
+﻿@model Inventory_Management_System.Models.ProductInventoryReportRequestViewModel
+
+@{
+    ViewData["Title"] = "Product Inventory Report";
+}
+
+<h1>Product Inventory Report</h1>
+
+<form asp-controller="ProductInventoryReport" asp-action="Index" method="post">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="SelectedProductId">Select Product (Optional)</label>
+                <select asp-for="SelectedProductId" asp-items="Model.AllProducts" class="form-control">
+                    <option value="">-- All Products --</option>
+                </select>
+                <small class="form-text text-muted">Leave blank to include all products.</small>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="SelectedWarehouseIds">Select Warehouses (Optional, multi-select)</label>
+                <select asp-for="SelectedWarehouseIds" asp-items="Model.AllWarehouses" class="form-control" multiple>
+                    <option value="">-- All Warehouses --</option>
+                </select>
+                <small class="form-text text-muted">Hold Ctrl/Cmd to select multiple, or leave blank for all warehouses.</small>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="StartDate">Entry Start Date (e.g., when added to warehouse)</label> @* CLARIFIED LABEL *@
+                <input asp-for="StartDate" type="date" class="form-control" />
+                <small class="form-text text-muted">Filter by the date product was first entered into the warehouse. Leave blank for no start date filter.</small> @* CLARIFIED HINT *@
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="EndDate">Entry End Date (e.g., when added to warehouse)</label> @* CLARIFIED LABEL *@
+                <input asp-for="EndDate" type="date" class="form-control" />
+                <small class="form-text text-muted">Filter by the date product was last entered into the warehouse. Leave blank for no end date filter.</small> @* CLARIFIED HINT *@
+            </div>
+        </div>
+    </div>
+    <div class="form-group mt-3">
+        <button type="submit" class="btn btn-primary">Generate Report</button>
+    </div>
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+</form>
+
+<hr />
+
+@if (Model.ReportData != null && Model.ReportData.Any())
+{
+    <h2>Report Results</h2>
+    @if (Model.StartDate.HasValue || Model.EndDate.HasValue)
+    {
+        <p class="text-info">
+            Showing products entered into warehouse between
+            @Html.Raw(Model.StartDate.HasValue ? Model.StartDate.Value.ToShortDateString() : "the beginning")
+            and
+            @Html.Raw(Model.EndDate.HasValue ? Model.EndDate.Value.ToShortDateString() : "now").
+        </p> @* DYNAMIC SUMMARY MESSAGE *@
+    }
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Product Code</th>
+                <th>Warehouse</th>
+                <th>Supplier</th>
+                <th>Quantity</th>
+                <th>Production Date</th>
+                <th>Entry Date into Warehouse</th> @* This label is clear based on existing code *@
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.ReportData)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.ProductName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.ProductCode)</td>
+                    <td>@Html.DisplayFor(modelItem => item.WarehouseName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.SupplierName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Quantity)</td>
+                    <td>@Html.DisplayFor(modelItem => item.ProductionDate)</td>
+                    <td>@Html.DisplayFor(modelItem => item.EntryDateIntoWarehouse)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else if (Model.ReportData != null)
+{
+    <div class="alert alert-info mt-4" role="alert">
+        No products found matching the selected criteria.
+    </div>
+}

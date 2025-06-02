@@ -1,0 +1,120 @@
+﻿@model IEnumerable<Inventory_Management_System.Models.ProductTransfer>
+
+@{
+    ViewData["Title"] = "Product Transfers";
+}
+
+<h1>Product Transfers</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New Transfer</a>
+</p>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<table class="table table-striped table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>Transfer Number</th>
+            <th>Transfer Date</th>
+            <th>From Warehouse</th>
+            <th>To Warehouse</th>
+            <th>Items</th>
+            <th>Created At</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model == null || !Model.Any())
+        {
+            <tr>
+                <td colspan="7" class="text-center">No product transfers found.</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@(item.TransferNumber ?? "N/A")</td>
+                    <td>@item.TransferDate.ToString("dd/MM/yyyy")</td>
+                    <td>@(item.SourceWarehouse?.Name ?? "Unknown")</td>
+                    <td>@(item.DestinationWarehouse?.Name ?? "Unknown")</td>
+                    <td>
+                        @if (item.Items != null && item.Items.Any())
+                        {
+                            <button type="button" class="btn btn-info btn-sm" data-bs-toggle="collapse" data-bs-target="#collapseItems_@item.Id" aria-expanded="false" aria-controls="collapseItems_@item.Id">
+                                View Items (@item.Items.Count)
+                            </button>
+                            <div class="collapse mt-2" id="collapseItems_@item.Id">
+                                <table class="table table-sm table-light table-bordered">
+                                    <thead class="table-secondary">
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Quantity</th>
+                                            <th>Supplier</th>
+                                            <th>Prod. Date</th>
+                                            <th>Expiry (Days)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var detail in item.Items)
+                                        {
+                                            <tr>
+                                                <td>@(detail.Product?.Name ?? "Unknown Product")</td>
+                                                <td>@detail.Quantity</td>
+                                                <td>@(detail.Supplier?.Name ?? "Unknown Supplier")</td>
+                                                <td>@detail.ProductionDate.ToString("dd/MM/yyyy")</td>
+                                                <td>@detail.ExpiryPeriodInDays</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No items</span>
+                        }
+                    </td>
+                    <td>@item.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>
+                        @* Placeholder for future actions *@
+                        <span class="text-muted">-</span>
+                        @* Uncomment when you implement these actions:
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info">Details</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                        *@
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        // Optional: Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    </script>
+}

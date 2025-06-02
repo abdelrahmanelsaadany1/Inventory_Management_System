@@ -1,0 +1,47 @@
+﻿@model IEnumerable<Inventory_Management_System.Models.ExpiryReportViewModel>
+
+@{
+    ViewData["Title"] = "Expiring Products Report";
+}
+
+<h1>Expiring Products Report</h1>
+
+<p>
+    Displaying products expiring within @ViewBag.DaysThreshold days.
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Product Name</th>
+            <th>Product Code</th>
+            <th>Warehouse</th>
+            <th>Supplier</th>
+            <th>Quantity</th>
+            <th>Production Date</th>
+            <th>Expiry Period (Days)</th>
+            <th>Expiry Date</th>
+            <th>Days Until Expiry</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.ProductName)</td>
+                <td>@Html.DisplayFor(modelItem => item.ProductCode)</td>
+                <td>@Html.DisplayFor(modelItem => item.WarehouseName)</td>
+                <td>@Html.DisplayFor(modelItem => item.SupplierName)</td>
+                <td>@Html.DisplayFor(modelItem => item.Quantity)</td>
+                <td>@Html.DisplayFor(modelItem => item.ProductionDate)</td>
+                <td>@Html.DisplayFor(modelItem => item.ExpiryPeriodInDays)</td>
+                <td>@Html.DisplayFor(modelItem => item.ExpiryDate)</td>
+                <td>@Html.DisplayFor(modelItem => item.DaysUntilExpiry)</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <a asp-controller="Home" asp-action="Index">Back to Home</a>
+</div>

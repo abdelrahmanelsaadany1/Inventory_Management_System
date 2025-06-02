@@ -1,0 +1,52 @@
+﻿@model IEnumerable<Inventory_Management_System.Models.StaleProductsReportViewModel>
+
+@{
+    ViewData["Title"] = "Products in Warehouse Report"; // Changed title to reflect new purpose
+}
+
+<h1>Products in Warehouse Report</h1>
+
+@* Removed the paragraph about "Displaying products that have been in the warehouse for at least X days." *@
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Product Code</th>
+                <th>Warehouse</th>
+                <th>Supplier</th>
+                <th>Quantity</th>
+                <th>Production Date</th>
+                <th>Entry Date into Warehouse</th>
+                <th>Days In Warehouse</th> @* This column will now always show the days *@
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.ProductName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.ProductCode)</td>
+                    <td>@Html.DisplayFor(modelItem => item.WarehouseName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.SupplierName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Quantity)</td>
+                    <td>@Html.DisplayFor(modelItem => item.ProductionDate)</td>
+                    <td>@Html.DisplayFor(modelItem => item.EntryDateIntoWarehouse)</td>
+                    <td>@Html.DisplayFor(modelItem => item.DaysInWarehouse)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else // If Model is null or empty
+{
+    <div class="alert alert-info mt-4" role="alert">
+        No products found in warehouses.
+    </div>
+}
+
+<div>
+    <a asp-controller="Home" asp-action="Index">Back to Home</a>
+</div>

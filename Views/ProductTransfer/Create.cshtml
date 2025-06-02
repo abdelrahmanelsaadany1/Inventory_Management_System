@@ -1,0 +1,162 @@
+﻿@model Inventory_Management_System.ViewModels.AddProductTransferViewModel
+
+@{
+    ViewData["Title"] = "Create Product Transfer";
+}
+
+<h2>Create Product Transfer</h2>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="TransferNumber"></label>
+        <input asp-for="TransferNumber" class="form-control" />
+        <span asp-validation-for="TransferNumber" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="TransferDate"></label>
+        <input asp-for="TransferDate" class="form-control" type="date" />
+        <span asp-validation-for="TransferDate" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="SourceWarehouseId">Source Warehouse</label>
+        <select asp-for="SourceWarehouseId" class="form-control" id="sourceWarehouse">
+            <option value="">-- Select Source Warehouse --</option>
+            @foreach (var warehouse in Model.Warehouses)
+            {
+                <option value="@warehouse.Id">@warehouse.Name</option>
+            }
+        </select>
+        <span asp-validation-for="SourceWarehouseId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="DestinationWarehouseId">Destination Warehouse</label>
+        <select asp-for="DestinationWarehouseId" class="form-control">
+            <option value="">-- Select Destination Warehouse --</option>
+            @foreach (var warehouse in Model.Warehouses)
+            {
+                <option value="@warehouse.Id">@warehouse.Name</option>
+            }
+        </select>
+        <span asp-validation-for="DestinationWarehouseId" class="text-danger"></span>
+    </div>
+
+    <hr />
+    <h4>Transfer Items</h4>
+
+    <div id="items-container"></div>
+
+    <button type="button" class="btn btn-secondary mb-3" onclick="addItem()">Add Item</button>
+
+    <button type="submit" class="btn btn-primary">Create Transfer</button>
+</form>
+
+<!-- Hidden row template -->
+<div id="item-template" class="d-none">
+    <div class="item-row border p-3 mb-3" data-index="__index__">
+        <h5>Item #<span class="item-number">__index__</span></h5>
+
+        <div class="form-group">
+            <label>Product</label>
+            <select name="Items[__index__].ProductId" class="form-control product-select" required></select>
+        </div>
+
+        <div class="form-group">
+            <label>Quantity</label>
+            <input name="Items[__index__].Quantity" class="form-control" type="number" min="1" required />
+        </div>
+
+        <div class="form-group">
+            <label>Supplier</label>
+            <select name="Items[__index__].SupplierId" class="form-control supplier-select" required></select>
+        </div>
+
+        <div class="form-group">
+            <label>Production Date</label>
+            <input name="Items[__index__].ProductionDate" class="form-control" type="date" required />
+        </div>
+
+        <div class="form-group">
+            <label>Expiry Period (Days)</label>
+            <input name="Items[__index__].ExpiryPeriodInDays" class="form-control" type="number" min="0" required />
+        </div>
+
+        <button type="button" class="btn btn-danger" onclick="removeItem(this)">Remove</button>
+        <hr />
+    </div>
+</div>
+@section Scripts {
+    <script>
+        let itemIndex = 0;
+        let warehouseInventory = [];
+
+        // Load inventory when source warehouse changes
+        document.getElementById("sourceWarehouse").addEventListener("change", function () {
+            const warehouseId = this.value;
+            if (warehouseId) {
+                fetch(`/ProductTransfer/GetWarehouseInventory?warehouseId=${warehouseId}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        warehouseInventory = data;
+                        alert("Warehouse inventory loaded. You can now add items.");
+                    });
+            }
+        });
+
+        function addItem() {
+            const container = document.getElementById("items-container");
+            const template = document.getElementById("item-template").innerHTML.replace(/__index__/g, itemIndex);
+            container.insertAdjacentHTML("beforeend", template);
+
+            const row = container.querySelector(`.item-row[data-index="${itemIndex}"]`);
+            const productSelect = row.querySelector(".product-select");
+            const supplierSelect = row.querySelector(".supplier-select");
+
+            const uniqueCombinations = [...new Map(warehouseInventory.map(item => [
+                `${item.ProductId}-${item.SupplierId}-${item.ProductionDate}`,
+                item
+            ])).values()];
+
+            uniqueCombinations.forEach(item => {
+                const optionText = `${item.ProductName} (Supplier: ${item.SupplierName}, Date: ${item.ProductionDate})`;
+                productSelect.innerHTML += `<option value="${item.ProductId}"
+                    data-supplier-id="${item.SupplierId}"
+                    data-supplier-name="${item.SupplierName}"
+                    data-date="${item.ProductionDate}"
+                    data-expiry="${item.ExpiryPeriodInDays}">${optionText}</option>`;
+            });
+
+            productSelect.addEventListener("change", function () {
+                const selectedOption = this.selectedOptions[0];
+                if (selectedOption && selectedOption.value) {
+                    // Auto-fill production date and expiry period
+                    row.querySelector("input[name$='ProductionDate']").value = selectedOption.getAttribute("data-date");
+                    row.querySelector("input[name$='ExpiryPeriodInDays']").value = selectedOption.getAttribute("data-expiry");
+
+                    // Populate supplier dropdown with the correct supplier
+                    const supplierId = selectedOption.getAttribute("data-supplier-id");
+                    const supplierName = selectedOption.getAttribute("data-supplier-name");
+
+                    supplierSelect.innerHTML = `<option value="">-- Select Supplier --</option>`;
+                    supplierSelect.innerHTML += `<option value="${supplierId}" selected>${supplierName}</option>`;
+                } else {
+                    // Clear fields if no product selected
+                    row.querySelector("input[name$='ProductionDate']").value = "";
+                    row.querySelector("input[name$='ExpiryPeriodInDays']").value = "";
+                    supplierSelect.innerHTML = `<option value="">-- Select Supplier --</option>`;
+                }
+            });
+
+            itemIndex++;
+        }
+
+        function removeItem(button) {
+            const row = button.closest(".item-row");
+            row.remove();
+        }
+    </script>
+
+    <partial name="_ValidationScriptsPartial" />
+}
