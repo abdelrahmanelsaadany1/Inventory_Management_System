@@ -12,7 +12,7 @@ namespace Inventory_Management_System.Controllers
     {
         private readonly InventoryDbContext _context = new InventoryDbContext();
 
-        // GET: SupplyOrder/Create
+     
         public IActionResult Create()
         {
             var viewModel = new AddSupplyOrderViewModel
@@ -29,7 +29,7 @@ namespace Inventory_Management_System.Controllers
             return View(viewModel);
         }
 
-        // POST: SupplyOrder/Create
+      
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(AddSupplyOrderViewModel viewModel)
@@ -74,27 +74,26 @@ namespace Inventory_Management_System.Controllers
 
                 _context.SupplyOrders.Add(supplyOrder);
 
-                // Add to WarehouseProducts table OR UPDATE existing entries
+             
                 foreach (var item in viewModel.Items)
                 {
-                    // Attempt to find an existing WarehouseProduct entry that matches the composite key
+                    
                     var existingWarehouseProduct = _context.WarehouseProducts.FirstOrDefault(wp =>
                         wp.WarehouseId == viewModel.WarehouseId &&
                         wp.ProductId == item.ProductId &&
                         wp.SupplierId == viewModel.SupplierId &&
-                        wp.ProductionDate == item.ProductionDate); // Crucial part of the composite key
+                        wp.ProductionDate == item.ProductionDate); 
 
                     if (existingWarehouseProduct != null)
                     {
-                        // If a matching entry is found, update its quantity
+                        
                         existingWarehouseProduct.Quantity += item.Quantity;
-                        existingWarehouseProduct.UpdatedAt = DateTime.Now; // Update the timestamp
-                        // Entity Framework Core automatically tracks changes to 'existingWarehouseProduct'
-                        // so no explicit _context.Entry(existingWarehouseProduct).State = EntityState.Modified; is needed here.
+                        existingWarehouseProduct.UpdatedAt = DateTime.Now; 
+                       
                     }
                     else
                     {
-                        // If no matching entry is found, create a new one
+                        
                         var warehouseProduct = new WarehouseProduct
                         {
                             WarehouseId = viewModel.WarehouseId,
@@ -103,13 +102,13 @@ namespace Inventory_Management_System.Controllers
                             ProductionDate = item.ProductionDate,
                             ExpiryPeriodInDays = item.ExpiryPeriodInDays,
                             SupplierId = viewModel.SupplierId,
-                            CreatedAt = DateTime.Now // This was the previous fix, ensure it's here
+                            CreatedAt = DateTime.Now 
                         };
-                        _context.WarehouseProducts.Add(warehouseProduct); // Add the new entity to the context
+                        _context.WarehouseProducts.Add(warehouseProduct); 
                     }
                 }
 
-                _context.SaveChanges(); // This will now correctly save new or updated entities
+                _context.SaveChanges(); 
 
                 TempData["SuccessMessage"] = "Supply order created successfully.";
                 return RedirectToAction("Index");
@@ -117,7 +116,7 @@ namespace Inventory_Management_System.Controllers
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error saving: {ex.Message}");
-                // Log the inner exception as well for more details if it's a DbUpdateException
+
                 if (ex.InnerException != null)
                 {
                     System.Diagnostics.Debug.WriteLine($"Inner Exception: {ex.InnerException.Message}");
@@ -129,7 +128,7 @@ namespace Inventory_Management_System.Controllers
             }
         }
 
-        // GET: SupplyOrder/Index
+        
         public IActionResult Index()
         {
             try

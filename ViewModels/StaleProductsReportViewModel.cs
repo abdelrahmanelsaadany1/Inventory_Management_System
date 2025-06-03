@@ -11,7 +11,7 @@ namespace Inventory_Management_System.Models
         public string SupplierName { get; set; }
         public int Quantity { get; set; }
         public DateTime ProductionDate { get; set; }
-        public DateTime EntryDateIntoWarehouse { get; set; } // Using CreatedAt from WarehouseProduct
-        public int DaysInWarehouse { get; set; } // Calculated based on EntryDateIntoWarehouse
+        public DateTime EntryDateIntoWarehouse { get; set; } 
+        public int DaysInWarehouse { get; set; } 
     }
 }

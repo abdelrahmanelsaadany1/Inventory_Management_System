@@ -1,7 +1,7 @@
 ﻿// Controllers/ExpiryReportController.cs
 using Inventory_Management_System.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore; // Required for .Include() and ToList()
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 
@@ -12,17 +12,17 @@ namespace Inventory_Management_System.Controllers
         private readonly InventoryDbContext _context = new InventoryDbContext();
 
         [HttpGet]
-        public IActionResult Index(int daysThreshold = 90) // Default to 90 days, can be passed as a query parameter
+        public IActionResult Index(int daysThreshold = 90)
         {
             var allWarehouseProducts = _context.WarehouseProducts
-                .Include(wp => wp.Product)    // Eager load Product details
-                .Include(wp => wp.Warehouse)   // Eager load Warehouse details
-                .Include(wp => wp.Supplier)    // Eager load Supplier details
-                .ToList(); // <--- IMPORTANT: This executes the query against the database and brings data into memory.
+                .Include(wp => wp.Product)
+                .Include(wp => wp.Warehouse)
+                .Include(wp => wp.Supplier)
+                .ToList();
 
             var expiringProducts = allWarehouseProducts
-                .Where(wp => !wp.IsExpired && wp.DaysUntilExpiry <= daysThreshold) // This filtering is now done in memory.
-                .OrderBy(wp => wp.DaysUntilExpiry) // Ordering can also be done in memory.
+                .Where(wp => !wp.IsExpired && wp.DaysUntilExpiry <= daysThreshold)
+                .OrderBy(wp => wp.DaysUntilExpiry)
                 .Select(wp => new ExpiryReportViewModel
                 {
                     ProductName = wp.Product.Name,
@@ -35,9 +35,9 @@ namespace Inventory_Management_System.Controllers
                     ExpiryDate = wp.ExpiryDate,
                     DaysUntilExpiry = wp.DaysUntilExpiry
                 })
-                .ToList(); // Final ToList to materialize the ViewModel collection.
+                .ToList();
 
-            ViewBag.DaysThreshold = daysThreshold; // Pass the threshold to the view
+            ViewBag.DaysThreshold = daysThreshold;
             return View("ExpiryReport", expiringProducts);
         }
     }

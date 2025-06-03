@@ -1,130 +1,130 @@
 ﻿@model Inventory_Management_System.ViewModels.ProductTransferViewModel
 
 @{
-    ViewData["Title"] = "تحويل المنتجات";
+    ViewData["Title"] = "Product Transfer";
 }
 
 <div class="container-fluid mt-4">
-<div class="row">
+    <div class="row">
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">تحويل منتجات جديد</h4>
+                    <h4 class="mb-0">New Product Transfer</h4>
                 </div>
                 <div class="card-body">
                     <form asp-action="Create" id="transferForm">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-            @if (TempData["SuccessMessage"] != null)
-            {
+                        @if (TempData["SuccessMessage"] != null)
+                        {
                             <div class="alert alert-success">
-                    @TempData["SuccessMessage"]
-                </div>
-            }
+                                @TempData["SuccessMessage"]
+                            </div>
+                        }
 
                         <div class="row mb-3">
-                <div class="col-md-4">
-                    <div class="form-group">
+                            <div class="col-md-4">
+                                <div class="form-group">
                                     <label asp-for="TransferDate" class="control-label"></label>
-                        <input asp-for="TransferDate" class="form-control" type="date" />
-                        <span asp-validation-for="TransferDate" class="text-danger"></span>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
+                                    <input asp-for="TransferDate" class="form-control" type="date" />
+                                    <span asp-validation-for="TransferDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
                                     <label asp-for="SourceWarehouseId" class="control-label"></label>
                                     <select asp-for="SourceWarehouseId" class="form-control" asp-items="ViewBag.Warehouses">
-                            <option value="">-- اختر المخزن المصدر --</option>
-                        </select>
-                        <span asp-validation-for="SourceWarehouseId" class="text-danger"></span>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
+                                        <option value="">-- Select Source Warehouse --</option>
+                                    </select>
+                                    <span asp-validation-for="SourceWarehouseId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
                                     <label asp-for="DestinationWarehouseId" class="control-label"></label>
                                     <select asp-for="DestinationWarehouseId" class="form-control" asp-items="ViewBag.Warehouses">
-                            <option value="">-- اختر المخزن المقصد --</option>
-                        </select>
-                        <span asp-validation-for="DestinationWarehouseId" class="text-danger"></span>
-                    </div>
-                </div>
-            </div>
+                                        <option value="">-- Select Destination Warehouse --</option>
+                                    </select>
+                                    <span asp-validation-for="DestinationWarehouseId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="card mb-3">
                             <div class="card-header bg-light">
-                                <h5 class="mb-0">المنتجات المتوفرة في المخزن المصدر</h5>
-            </div>
+                                <h5 class="mb-0">Products Available in Source Warehouse</h5>
+                            </div>
                             <div class="card-body">
                                 <div id="productsTable" style="display: none;">
-            <div class="table-responsive">
+                                    <div class="table-responsive">
                                         <table class="table table-bordered table-hover">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>المنتج</th>
-                            <th>المورد</th>
-                            <th>تاريخ الإنتاج</th>
-                                                    <th>فترة الصلاحية</th>
-                                                    <th>الكمية المتوفرة</th>
-                            <th>الكمية المطلوبة</th>
-                                                    <th>إضافة</th>
-                        </tr>
-                    </thead>
+                                            <thead class="thead-dark">
+                                                <tr>
+                                                    <th>Product</th>
+                                                    <th>Supplier</th>
+                                                    <th>Production Date</th>
+                                                    <th>Expiry Period</th>
+                                                    <th>Available Quantity</th>
+                                                    <th>Requested Quantity</th>
+                                                    <th>Add</th>
+                                                </tr>
+                                            </thead>
                                             <tbody id="productsTableBody">
-                    </tbody>
-                </table>
-            </div>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                                 <div id="noWarehouseSelected" class="alert alert-info">
-                                    <i class="fas fa-info-circle"></i> الرجاء اختيار المخزن المصدر لعرض المنتجات المتوفرة
+                                    <i class="fas fa-info-circle"></i> Please select a source warehouse to view available products.
                                 </div>
                                 <div id="loadingProducts" style="display: none;" class="text-center">
                                     <div class="spinner-border text-primary" role="status">
-                                        <span class="sr-only">جاري التحميل...</span>
+                                        <span class="sr-only">Loading...</span>
                                     </div>
-                                    <p>جاري تحميل المنتجات...</p>
+                                    <p>Loading products...</p>
                                 </div>
                                 <div id="noProducts" style="display: none;" class="alert alert-warning">
-                                    <i class="fas fa-exclamation-triangle"></i> لا توجد منتجات متوفرة في هذا المخزن
-            </div>
-    </div>
-</div>
+                                    <i class="fas fa-exclamation-triangle"></i> No products available in this warehouse.
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="card mb-3">
                             <div class="card-header bg-light">
-                                <h5 class="mb-0">المنتجات المراد تحويلها</h5>
+                                <h5 class="mb-0">Products to Transfer</h5>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
                                     <table class="table table-bordered table-hover" id="selectedProductsTable">
                                         <thead class="thead-dark">
                                             <tr>
-                                                <th>المنتج</th>
-                                                <th>المورد</th>
-                                                <th>تاريخ الإنتاج</th>
-                                                <th>الكمية</th>
-                                                <th>حذف</th>
+                                                <th>Product</th>
+                                                <th>Supplier</th>
+                                                <th>Production Date</th>
+                                                <th>Quantity</th>
+                                                <th>Remove</th>
                                             </tr>
                                         </thead>
                                         <tbody id="selectedProductsTableBody">
                                             <tr id="noItemsRow">
                                                 <td colspan="5" class="text-center text-muted">
-                                                    <i class="fas fa-box"></i> لم يتم إضافة منتجات بعد
+                                                    <i class="fas fa-box"></i> No products added yet.
                                                 </td>
                                             </tr>
                                         </tbody>
                                     </table>
-            </div>
-                </div>
-                </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="form-group text-center">
                             <button type="submit" class="btn btn-primary btn-lg" id="submitButton" disabled>
-                                <i class="fas fa-exchange-alt"></i> تنفيذ التحويل
+                                <i class="fas fa-exchange-alt"></i> Execute Transfer
                             </button>
                             <a asp-action="Index" class="btn btn-secondary btn-lg">
-                                <i class="fas fa-times"></i> إلغاء
+                                <i class="fas fa-times"></i> Cancel
                             </a>
-                </div>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -133,7 +133,9 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
     <script>
@@ -144,7 +146,7 @@
             $('#SourceWarehouseId').change(function () {
                 const warehouseId = $(this).val();
                 clearProducts();
-                
+
                 if (!warehouseId) {
                     $('#productsTable').hide();
                     $('#noWarehouseSelected').show();
@@ -164,7 +166,7 @@
                 $.get('/ProductTransfer/GetWarehouseProducts', { warehouseId: warehouseId })
                     .done(function (data) {
                         $('#loadingProducts').hide();
-                        
+
                         if (data && data.length > 0) {
                             displayProducts(data);
                         } else {
@@ -173,7 +175,7 @@
                     })
                     .fail(function (error) {
                         $('#loadingProducts').hide();
-                        alert('حدث خطأ أثناء تحميل المنتجات');
+                        alert('An error occurred while loading products');
                         console.error('Error:', error);
                     });
             }
@@ -189,13 +191,13 @@
                             <td>${product.productName}</td>
                             <td>${product.supplierName}</td>
                             <td>${new Date(product.productionDate).toLocaleDateString()}</td>
-                            <td>${product.expiryPeriodInDays} يوم</td>
+                            <td>${product.expiryPeriodInDays} days</td>
                             <td>${product.quantity}</td>
                             <td>
-                                <input type="number" class="form-control quantity-input" 
+                                <input type="number" class="form-control quantity-input"
                                        min="1" max="${product.quantity}" value="1"
                                        data-product-id="${product.productId}"
-                                       data-supplier-id="${product.suppliererId}"
+                                       data-supplier-id="${product.supplierId}"
                                        style="width: 100px">
                             </td>
                             <td>
@@ -207,7 +209,7 @@
                                         data-production-date="${product.productionDate}"
                                         data-expiry-period="${product.expiryPeriodInDays}"
                                         data-available-quantity="${product.quantity}">
-                                    <i class="fas fa-plus"></i> إضافة
+                                    <i class="fas fa-plus"></i> Add
                                 </button>
                             </td>
                         </tr>
@@ -226,7 +228,7 @@
                 const maxQuantity = parseInt(btn.data('available-quantity'));
 
                 if (isNaN(quantity) || quantity <= 0 || quantity > maxQuantity) {
-                    alert('الرجاء إدخال كمية صحيحة');
+                    alert('Please enter a valid quantity');
                     return;
                 }
 
@@ -241,14 +243,14 @@
                 };
 
                 // Check if product already exists
-                const existingProduct = selectedProducts.find(p => 
-                    p.productId === product.productId && 
-                    p.supplierId === product.supplierId && 
+                const existingProduct = selectedProducts.find(p =>
+                    p.productId === product.productId &&
+                    p.supplierId === product.supplierId &&
                     p.productionDate === product.productionDate
                 );
 
                 if (existingProduct) {
-                    alert('هذا المنتج موجود بالفعل في قائمة التحويل');
+                    alert('This product is already in the transfer list');
                     return;
                 }
 
@@ -266,7 +268,7 @@
                     tbody.html(`
                         <tr id="noItemsRow">
                             <td colspan="5" class="text-center text-muted">
-                                <i class="fas fa-box"></i> لم يتم إضافة منتجات بعد
+                                <i class="fas fa-box"></i> No products added yet.
                             </td>
                         </tr>
                     `);
@@ -280,28 +282,28 @@
                                 ${product.productName}
                                 <input type="hidden" name="Items[${index}].ProductId" value="${product.productId}">
                                 <input type="hidden" name="Items[${index}].ProductName" value="${product.productName}">
-                        </td>
-                        <td>
+                            </td>
+                            <td>
                                 ${product.supplierName}
                                 <input type="hidden" name="Items[${index}].SupplierId" value="${product.supplierId}">
                                 <input type="hidden" name="Items[${index}].SupplierName" value="${product.supplierName}">
-                        </td>
-                        <td>
+                            </td>
+                            <td>
                                 ${new Date(product.productionDate).toLocaleDateString()}
                                 <input type="hidden" name="Items[${index}].ProductionDate" value="${product.productionDate}">
                                 <input type="hidden" name="Items[${index}].ExpiryPeriodInDays" value="${product.expiryPeriodInDays}">
-                        </td>
-                        <td>
+                            </td>
+                            <td>
                                 ${product.quantity}
                                 <input type="hidden" name="Items[${index}].Quantity" value="${product.quantity}">
-                        </td>
-                        <td>
+                            </td>
+                            <td>
                                 <button type="button" class="btn btn-danger btn-sm remove-product" data-index="${index}">
-                                <i class="fas fa-trash"></i> حذف
-                            </button>
-                        </td>
-                    </tr>
-                `;
+                                <i class="fas fa-trash"></i> Remove
+                                </button>
+                            </td>
+                        </tr>
+                    `;
                     tbody.append(row);
                 });
             }
@@ -340,7 +342,7 @@
             $('#transferForm').submit(function (e) {
                 if (!selectedProducts.length) {
                     e.preventDefault();
-                    alert('الرجاء إضافة منتج واحد على الأقل للتحويل');
+                    alert('Please add at least one product to transfer');
                     return false;
                 }
             });
@@ -358,6 +360,8 @@
         .table td {
             vertical-align: middle;
             text-align: center;
+            /* For right-to-left layout, you might want to keep this right-aligned or adjust as needed */
+            /* text-align: right; */
         }
 
         .quantity-input {

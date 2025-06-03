@@ -10,7 +10,7 @@ namespace Inventory_Management_System.ViewModels
         public int ProductId { get; set; }
 
         [Required(ErrorMessage = "Quantity is required")]
-        [Range(1, 1000000, ErrorMessage = "Quantity must be greater than 0")] // Adjust max value as needed
+        [Range(1, 1000000, ErrorMessage = "Quantity must be greater than 0")] 
         public int Quantity { get; set; }
     }
 }

@@ -9,21 +9,19 @@ namespace Inventory_Management_System.Controllers
     {
         private readonly InventoryDbContext _context = new InventoryDbContext();
 
-        // List all customers
+     
         public IActionResult Index()
         {
             var customers = _context.Customers.ToList();
             return View(customers);
         }
 
-        // Show add form
         [HttpGet]
         public IActionResult Add()
         {
             return View();
         }
 
-        // Handle add POST
         [HttpPost]
         public IActionResult SaveAdd(Customer customer)
         {
@@ -37,7 +35,7 @@ namespace Inventory_Management_System.Controllers
             return View("Add", customer);
         }
 
-        // Show edit form
+      
         [HttpGet]
         public IActionResult Edit(int id)
         {
@@ -46,7 +44,7 @@ namespace Inventory_Management_System.Controllers
             return View(customer);
         }
 
-        // Handle edit POST
+      
         [HttpPost]
         public IActionResult SaveEdit(Customer customer)
         {

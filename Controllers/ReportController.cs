@@ -12,12 +12,12 @@ namespace Inventory_Management_System.Controllers
     {
         private readonly InventoryDbContext _context = new InventoryDbContext();
 
-        // GET: Report/ItemMovement
+       
         public IActionResult ItemMovement()
         {
             var viewModel = new ItemMovementReportViewModel
             {
-                StartDate = DateTime.Today.AddDays(-30), // Default to last 30 days
+                StartDate = DateTime.Today.AddDays(-30), 
                 EndDate = DateTime.Today,
                 AvailableWarehouses = _context.Warehouses
                     .Select(w => new WarehouseDto
@@ -31,7 +31,7 @@ namespace Inventory_Management_System.Controllers
             return View(viewModel);
         }
 
-        // POST: Report/ItemMovement
+    
         [HttpPost]
         public IActionResult ItemMovement(ItemMovementReportViewModel model)
         {
@@ -47,12 +47,11 @@ namespace Inventory_Management_System.Controllers
                 return View(model);
             }
 
-            // Get all warehouses if none selected
+           
             var warehouseIds = model.SelectedWarehouseIds?.Any() == true 
                 ? model.SelectedWarehouseIds 
                 : _context.Warehouses.Select(w => w.Id).ToList();
 
-            // Get initial quantities (at start date)
             var initialQuantities = _context.WarehouseProducts
                 .Where(wp => warehouseIds.Contains(wp.WarehouseId))
                 .GroupBy(wp => new { wp.ProductId, wp.WarehouseId })
@@ -64,7 +63,7 @@ namespace Inventory_Management_System.Controllers
                 })
                 .ToDictionary(x => (x.ProductId, x.WarehouseId), x => x.Quantity);
 
-            // Get supply orders within date range
+           
             var supplyQuantities = _context.SupplyOrderItems
                 .Include(soi => soi.SupplyOrder)
                 .Where(soi => soi.SupplyOrder.OrderDate >= model.StartDate 
@@ -79,7 +78,7 @@ namespace Inventory_Management_System.Controllers
                 })
                 .ToDictionary(x => (x.ProductId, x.WarehouseId), x => x.Quantity);
 
-            // Get release orders within date range
+           
             var releaseQuantities = _context.ReleaseOrderItems
                 .Include(roi => roi.ReleaseOrder)
                 .Where(roi => roi.ReleaseOrder.OrderDate >= model.StartDate 
@@ -94,7 +93,6 @@ namespace Inventory_Management_System.Controllers
                 })
                 .ToDictionary(x => (x.ProductId, x.WarehouseId), x => x.Quantity);
 
-            // Get all products and warehouses involved
             var products = _context.Products
                 .Where(p => initialQuantities.Keys.Select(k => k.ProductId).Contains(p.Id)
                     || supplyQuantities.Keys.Select(k => k.ProductId).Contains(p.Id)
@@ -105,7 +103,7 @@ namespace Inventory_Management_System.Controllers
                 .Where(w => warehouseIds.Contains(w.Id))
                 .ToDictionary(w => w.Id, w => w);
 
-            // Compile results
+           
             var results = new List<ItemMovementResult>();
 
             foreach (var product in products.Values)
@@ -130,7 +128,7 @@ namespace Inventory_Management_System.Controllers
                 }
             }
 
-            // Update model with results
+           
             model.Results = results;
             model.AvailableWarehouses = warehouses.Values
                 .Select(w => new WarehouseDto

@@ -23,23 +23,11 @@ namespace Inventory_Management_System.Models
         [Required(ErrorMessage = "Destination warehouse is required.")]
         public int DestinationWarehouseId { get; set; }
 
-        // THESE PROPERTIES ARE REMOVED FROM PRODUCTTRANSFER (HEADER)
-        // public int ProductId { get; set; }
-        // public int Quantity { get; set; }
-        // public int SupplierId { get; set; }
-        // public DateTime ProductionDate { get; set; }
-        // public int ExpiryPeriodInDays { get; set; }
-
-        // Navigation Properties for the main transfer header
+       
         public Warehouse SourceWarehouse { get; set; }
         public Warehouse DestinationWarehouse { get; set; }
-        // Also remove direct navigation properties like Product Product and Supplier Supplier from here
-        // public Product Product { get; set; }
-        // public Supplier Supplier { get; set; }
-
-
-        // THIS IS THE CRUCIAL ADDITION FOR THE HEADER-DETAIL PATTERN
-        [JsonIgnore] // Important to prevent serialization cycles
+       
+        [JsonIgnore] 
         public ICollection<ProductTransferItem> Items { get; set; } = new HashSet<ProductTransferItem>();
     }
 }

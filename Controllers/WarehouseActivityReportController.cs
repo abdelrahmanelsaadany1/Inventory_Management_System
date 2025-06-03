@@ -87,9 +87,9 @@ namespace Inventory_Management_System.Controllers
                 query = query.Where(wp => wp.CreatedAt.Date <= endDate.Value.Date);
             }
 
-            // ADDED: Order by Product Name and then Entry Date for visual grouping
+         
             query = query.OrderBy(wp => wp.Product.Name)
-                         .ThenBy(wp => wp.CreatedAt); // Ensures consistent order for duplicate products
+                         .ThenBy(wp => wp.CreatedAt); 
 
             var reportData = query
                 .Select(wp => new WarehouseActivityReportViewModel

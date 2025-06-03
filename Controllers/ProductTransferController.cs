@@ -12,7 +12,7 @@ namespace Inventory_Management_System.Controllers
     public class ProductTransferController : Controller
     {
         private readonly InventoryDbContext _context = new InventoryDbContext();
-        // GET: ProductTransfer
+       
         public async Task<IActionResult> Index()
         {
             var transfers = await _context.ProductTransfers
@@ -25,7 +25,7 @@ namespace Inventory_Management_System.Controllers
             return View(transfers);
         }
 
-        // GET: ProductTransfer/GetDetails/5
+        
         [HttpGet]
         public async Task<IActionResult> GetDetails(int id)
         {
@@ -63,7 +63,7 @@ namespace Inventory_Management_System.Controllers
             return Json(result);
         }
 
-        // GET: ProductTransfer/Create
+       
         public async Task<IActionResult> Create()
         {
             var warehouses = await _context.Warehouses.OrderBy(w => w.Name).ToListAsync();
@@ -75,7 +75,7 @@ namespace Inventory_Management_System.Controllers
             });
         }
 
-        // GET: Get products in warehouse
+      
         [HttpGet]
         public async Task<IActionResult> GetWarehouseProducts(int warehouseId)
         {
@@ -106,7 +106,7 @@ namespace Inventory_Management_System.Controllers
             }
         }
 
-        // POST: ProductTransfer/Create
+       
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ProductTransferViewModel model)
@@ -136,7 +136,7 @@ namespace Inventory_Management_System.Controllers
 
                     foreach (var item in model.Items)
                     {
-                        // Check source warehouse stock
+       
                         var sourceProduct = await _context.WarehouseProducts
                             .FirstOrDefaultAsync(wp => 
                                 wp.WarehouseId == model.SourceWarehouseId &&
@@ -149,11 +149,11 @@ namespace Inventory_Management_System.Controllers
                             throw new Exception($"الكمية غير متوفرة للمنتج {item.ProductName}");
                         }
 
-                        // Decrease source quantity
+                 
                         sourceProduct.Quantity -= item.Quantity;
                         _context.Update(sourceProduct);
 
-                        // Add or update destination quantity
+                        
                         var destProduct = await _context.WarehouseProducts
                             .FirstOrDefaultAsync(wp =>
                                 wp.WarehouseId == model.DestinationWarehouseId &&
@@ -183,7 +183,7 @@ namespace Inventory_Management_System.Controllers
                             _context.Update(destProduct);
                         }
 
-                        // Create transfer item
+                       
                         var transferItem = new ProductTransferItem
                         {
                             ProductTransferId = transfer.Id,
@@ -216,10 +216,9 @@ namespace Inventory_Management_System.Controllers
             return View(model);
         }
 
-        // GET: ProductTransfer/MovementReport
+        
         public async Task<IActionResult> MovementReport(DateTime? fromDate, DateTime? toDate, int? productId, int? warehouseId)
         {
-            // Prepare dropdown lists
             ViewBag.Products = new SelectList(await _context.Products.OrderBy(p => p.Name).ToListAsync(), "Id", "Name");
             ViewBag.Warehouses = new SelectList(await _context.Warehouses.OrderBy(w => w.Name).ToListAsync(), "Id", "Name");
 
@@ -242,7 +241,6 @@ namespace Inventory_Management_System.Controllers
                     .Include(pti => pti.Supplier)
                     .AsQueryable();
 
-                // Apply filters
                 if (fromDate.HasValue)
                 {
                     query = query.Where(pti => pti.ProductTransfer.TransferDate >= fromDate.Value.Date);
@@ -265,7 +263,7 @@ namespace Inventory_Management_System.Controllers
                         pti.ProductTransfer.DestinationWarehouseId == warehouseId.Value);
                 }
 
-                // Get results
+                
                 var movements = await query
                     .OrderByDescending(pti => pti.ProductTransfer.TransferDate)
                     .Select(pti => new ProductMovementItem

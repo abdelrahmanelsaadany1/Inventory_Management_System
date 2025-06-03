@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Warehouse Activity Report";
-    // Initialize a variable to track the product name of the previous row
+
     string previousProductName = "";
 }
 
@@ -70,7 +70,7 @@
         <tbody>
             @foreach (var item in Model.ReportData)
             {
-                // Determine if the current product name is the same as the one from the previous row
+
                 bool isProductNameDuplicated = (item.ProductName == previousProductName);
 
                 <tr>
@@ -81,7 +81,6 @@
                         }
                         else
                         {
-                            // If it's a duplicate, render an empty cell (or a non-breaking space for spacing)
                             @:&nbsp;
                         }
                     </td>
@@ -93,8 +92,6 @@
                     <td>@Html.DisplayFor(modelItem => item.DaysInWarehouse)</td>
                 </tr>
 
-                @* CORRECTED LINE: No @{} around this single statement.
-                   Razor understands it's C# code within the foreach loop. *@
                 previousProductName = item.ProductName;
             }
         </tbody>

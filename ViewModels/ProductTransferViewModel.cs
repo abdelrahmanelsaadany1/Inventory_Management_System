@@ -6,16 +6,16 @@ namespace Inventory_Management_System.ViewModels
 {
     public class ProductTransferViewModel
     {
-        [Required(ErrorMessage = "تاريخ التحويل مطلوب")]
-        [Display(Name = "تاريخ التحويل")]
+        [Required(ErrorMessage = "Transfer Date is required")]
+        [Display(Name = "Transfer Date")]
         public DateTime TransferDate { get; set; }
 
-        [Required(ErrorMessage = "المخزن المصدر مطلوب")]
-        [Display(Name = "المخزن المصدر")]
+        [Required(ErrorMessage = "Source Warehouse is required")]
+        [Display(Name = "Source Warehouse")]
         public int SourceWarehouseId { get; set; }
 
-        [Required(ErrorMessage = "المخزن المقصد مطلوب")]
-        [Display(Name = "المخزن المقصد")]
+        [Required(ErrorMessage = "Destination Warehouse is required")]
+        [Display(Name = "Destination Warehouse")]
         public int DestinationWarehouseId { get; set; }
 
         public List<ProductTransferItemViewModel> Items { get; set; } = new List<ProductTransferItemViewModel>();
@@ -25,17 +25,17 @@ namespace Inventory_Management_System.ViewModels
     {
         public int ProductId { get; set; }
         public string ProductName { get; set; }
-        
+
         public int SupplierId { get; set; }
         public string SupplierName { get; set; }
-        
+
         public DateTime ProductionDate { get; set; }
         public int ExpiryPeriodInDays { get; set; }
-        
-        [Required(ErrorMessage = "الكمية مطلوبة")]
-        [Range(1, int.MaxValue, ErrorMessage = "الكمية يجب أن تكون أكبر من صفر")]
+
+        [Required(ErrorMessage = "Quantity is required")]
+        [Range(1, int.MaxValue, ErrorMessage = "Quantity must be greater than zero")]
         public int Quantity { get; set; }
-        
+
         public int AvailableQuantity { get; set; }
     }
 }

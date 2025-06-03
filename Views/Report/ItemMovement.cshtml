@@ -1,8 +1,53 @@
 @model Inventory_Management_System.ViewModels.ItemMovementReportViewModel
 
 @{
-    ViewData["Title"] = "تقرير حركة الأصناف";
+    ViewData["Title"] = "Item Movement Report";
 }
+
+<style>
+    .select2-container--bootstrap4 .select2-selection--multiple {
+        background-color: #fff;
+        border: 1px solid #ced4da;
+    }
+
+        .select2-container--bootstrap4 .select2-selection--multiple .select2-selection__choice {
+            background-color: #6f42c1;
+            border: 1px solid #6610f2;
+            color: #fff;
+            padding: 3px 8px;
+            margin: 2px;
+            border-radius: 4px;
+        }
+
+        .select2-container--bootstrap4 .select2-selection--multiple .select2-selection__clear {
+            color: #6f42c1;
+            font-weight: bold;
+            margin-left: 5px;
+            margin-right: 5px;
+            font-size: 18px;
+        }
+
+            .select2-container--bootstrap4 .select2-selection--multiple .select2-selection__clear:hover {
+                color: #dc3545;
+            }
+
+    .select2-container--bootstrap4 .select2-dropdown {
+        border-color: #6f42c1;
+    }
+
+    .select2-container--bootstrap4 .select2-results__option--highlighted[aria-selected] {
+        background-color: #6f42c1 !important;
+        color: #fff;
+    }
+
+    .select2-container--bootstrap4 .select2-search--dropdown .select2-search__field {
+        border: 1px solid #6f42c1;
+    }
+
+    .select2-container--bootstrap4.select2-container--focus .select2-selection {
+        border-color: #6f42c1;
+    }
+</style>
 
 <div class="container">
     <h2 class="text-center mb-4">@ViewData["Title"]</h2>
@@ -29,17 +74,18 @@
                         <div class="form-group">
                             <label asp-for="SelectedWarehouseIds" class="control-label"></label>
                             <select asp-for="SelectedWarehouseIds" class="form-control select2" multiple>
+                                <option></option>
                                 @foreach (var warehouse in Model.AvailableWarehouses)
                                 {
                                     <option value="@warehouse.Id">@warehouse.Name</option>
                                 }
                             </select>
-                            <small class="form-text text-muted">اترك الاختيار فارغاً لعرض جميع المخازن</small>
+                            <small class="form-text text-muted">Leave blank to show all warehouses</small>
                         </div>
                     </div>
                 </div>
                 <div class="text-center mt-3">
-                    <button type="submit" class="btn btn-primary">عرض التقرير</button>
+                    <button type="submit" class="btn btn-primary">Show Report</button>
                 </div>
             </form>
         </div>
@@ -53,13 +99,13 @@
                     <table class="table table-striped table-bordered">
                         <thead>
                             <tr>
-                                <th>كود الصنف</th>
-                                <th>اسم الصنف</th>
-                                <th>المخزن</th>
-                                <th>الرصيد الافتتاحي</th>
-                                <th>الوارد</th>
-                                <th>المنصرف</th>
-                                <th>الرصيد النهائي</th>
+                                <th>Item Code</th>
+                                <th>Item Name</th>
+                                <th>Warehouse</th>
+                                <th>Initial Quantity</th>
+                                <th>Incoming</th>
+                                <th>Outgoing</th>
+                                <th>Final Quantity</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -87,10 +133,29 @@
     <script>
         $(document).ready(function() {
             $('.select2').select2({
-                placeholder: "اختر المخازن",
+                theme: 'bootstrap4',
                 allowClear: true,
-                dir: "rtl"
+                placeholder: {
+                    id: '',
+                    text: 'Select Warehouses'
+                },
+                dir: "ltr", // Changed to ltr for English
+                language: {
+                    noResults: function() {
+                        return "No results found";
+                    }
+                },
+                width: '100%',
+                templateResult: formatState,
+                templateSelection: formatState
             });
+
+            function formatState(state) {
+                if (!state.id) {
+                    return state.text;
+                }
+                return $('<span style="padding: 3px;">' + state.text + '</span>');
+            }
         });
     </script>
-} 
+}

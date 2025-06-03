@@ -1,12 +1,10 @@
 ﻿@model IEnumerable<Inventory_Management_System.Models.StaleProductsReportViewModel>
 
 @{
-    ViewData["Title"] = "Products in Warehouse Report"; // Changed title to reflect new purpose
+    ViewData["Title"] = "Products in Warehouse Report";
 }
 
 <h1>Products in Warehouse Report</h1>
-
-@* Removed the paragraph about "Displaying products that have been in the warehouse for at least X days." *@
 
 @if (Model != null && Model.Any())
 {
@@ -20,7 +18,7 @@
                 <th>Quantity</th>
                 <th>Production Date</th>
                 <th>Entry Date into Warehouse</th>
-                <th>Days In Warehouse</th> @* This column will now always show the days *@
+                <th>Days In Warehouse</th>
             </tr>
         </thead>
         <tbody>
@@ -40,7 +38,7 @@
         </tbody>
     </table>
 }
-else // If Model is null or empty
+else
 {
     <div class="alert alert-info mt-4" role="alert">
         No products found in warehouses.

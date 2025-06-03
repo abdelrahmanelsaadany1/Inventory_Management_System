@@ -11,7 +11,7 @@ namespace Inventory_Management_System.Models
         public string WarehouseName { get; set; }
         public string SupplierName { get; set; }
 
-        [DisplayFormat(DataFormatString = "{0:N0}")] // Format quantity nicely
+        [DisplayFormat(DataFormatString = "{0:N0}")] 
         public int Quantity { get; set; }
 
         [DataType(DataType.Date)]
@@ -20,6 +20,6 @@ namespace Inventory_Management_System.Models
 
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}")]
-        public DateTime EntryDateIntoWarehouse { get; set; } // Corresponds to WarehouseProduct.CreatedAt
+        public DateTime EntryDateIntoWarehouse { get; set; } 
     }
 }

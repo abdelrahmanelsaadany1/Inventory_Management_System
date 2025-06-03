@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Inventory_Management_System.Models; // Assuming models are in this namespace
+using Inventory_Management_System.Models;
 
 namespace Inventory_Management_System.ViewModels
 {
@@ -15,12 +15,12 @@ namespace Inventory_Management_System.ViewModels
         [Required(ErrorMessage = "End Date is required.")]
         [DataType(DataType.Date)]
         [Display(Name = "End Date")]
-        public DateTime EndDate { get; set; } = DateTime.Today; // Default to today
+        public DateTime EndDate { get; set; } = DateTime.Today; 
 
         [Display(Name = "Select Warehouses")]
         public List<int> SelectedWarehouseIds { get; set; } = new List<int>();
 
-        // For dropdowns in the view
+      
         public IEnumerable<Warehouse> AvailableWarehouses { get; set; }
     }
 }

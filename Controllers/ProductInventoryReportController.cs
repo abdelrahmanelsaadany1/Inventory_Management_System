@@ -1,10 +1,8 @@
 ﻿// Controllers/ProductInventoryReportController.cs
 using Inventory_Management_System.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering; // For SelectList
-using Microsoft.EntityFrameworkCore; // Required for .Include()
-using System;
-using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 namespace Inventory_Management_System.Controllers
@@ -13,7 +11,6 @@ namespace Inventory_Management_System.Controllers
     {
         private readonly InventoryDbContext _context = new InventoryDbContext();
 
-        // GET: ProductInventoryReport
         [HttpGet]
         public IActionResult Index()
         {
@@ -25,20 +22,17 @@ namespace Inventory_Management_System.Controllers
             return View(model);
         }
 
-        // POST: ProductInventoryReport/GenerateReport
         [HttpPost]
         public IActionResult Index(ProductInventoryReportRequestViewModel request)
         {
-            // Re-populate dropdowns for the view (important if validation fails or view is re-rendered)
             request.AllProducts = new SelectList(_context.Products.OrderBy(p => p.Name), "Id", "Name", request.SelectedProductId);
             request.AllWarehouses = new SelectList(_context.Warehouses.OrderBy(w => w.Name), "Id", "Name", request.SelectedWarehouseIds);
 
             IQueryable<WarehouseProduct> query = _context.WarehouseProducts
                 .Include(wp => wp.Product)
                 .Include(wp => wp.Warehouse)
-                .Include(wp => wp.Supplier); // Assuming Supplier is linked to WarehouseProduct
+                .Include(wp => wp.Supplier);
 
-            // Apply filters based on user input
             if (request.SelectedProductId.HasValue)
             {
                 query = query.Where(wp => wp.ProductId == request.SelectedProductId.Value);
@@ -51,20 +45,16 @@ namespace Inventory_Management_System.Controllers
 
             if (request.StartDate.HasValue)
             {
-                // Ensure comparison is only on the date part
                 query = query.Where(wp => wp.CreatedAt.Date >= request.StartDate.Value.Date);
             }
 
             if (request.EndDate.HasValue)
             {
-                // Ensure comparison is only on the date part, and include the end date's entire day
                 query = query.Where(wp => wp.CreatedAt.Date <= request.EndDate.Value.Date);
             }
 
-            // Order for consistency
             query = query.OrderBy(wp => wp.Product.Name).ThenBy(wp => wp.Warehouse.Name).ThenBy(wp => wp.CreatedAt);
 
-            // Project to the ReportData ViewModel
             request.ReportData = query.Select(wp => new ProductInventoryReportViewModel
             {
                 ProductName = wp.Product.Name,
@@ -74,9 +64,9 @@ namespace Inventory_Management_System.Controllers
                 Quantity = wp.Quantity,
                 ProductionDate = wp.ProductionDate,
                 EntryDateIntoWarehouse = wp.CreatedAt
-            }).ToList(); // Execute the query and bring data into memory
+            }).ToList();
 
-            return View(request); // Return the same view, but now with the report data populated
+            return View(request);
         }
     }
 }

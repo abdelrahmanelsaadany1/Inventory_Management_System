@@ -7,16 +7,16 @@ namespace Inventory_Management_System.ViewModels
     public class ItemMovementReportViewModel
     {
         [Required]
-        [Display(Name = "تاريخ البداية")]
+        [Display(Name = "Start Date")]
         [DataType(DataType.Date)]
         public DateTime StartDate { get; set; }
 
         [Required]
-        [Display(Name = "تاريخ النهاية")]
+        [Display(Name = "End Date")]
         [DataType(DataType.Date)]
         public DateTime EndDate { get; set; }
 
-        [Display(Name = "المخازن")]
+        [Display(Name = "Warehouses")]
         public List<int> SelectedWarehouseIds { get; set; }
 
         public List<WarehouseDto> AvailableWarehouses { get; set; }
@@ -47,4 +47,4 @@ namespace Inventory_Management_System.ViewModels
         public int OutgoingQuantity { get; set; }
         public int FinalQuantity { get; set; }
     }
-} 
+}
