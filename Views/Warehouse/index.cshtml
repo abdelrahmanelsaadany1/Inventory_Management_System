@@ -11,6 +11,7 @@
         <tr>
             <th>Name</th>
             <th>Address</th>
+            <th>Manager Name</th> @* ADDED: Manager Name header *@
             <th>Created At</th>
             <th>Updated At</th>
             <th>Actions</th>
@@ -22,6 +23,16 @@
             <tr>
                 <td>@warehouse.Name</td>
                 <td>@warehouse.Address</td>
+                <td>
+                    @if (warehouse.Manager != null) @* ADDED: Display Manager Name with null check *@
+                    {
+                        @warehouse.Manager.Name
+                    }
+                    else
+                    {
+                        <span>N/A</span> @* Display N/A if no manager is assigned *@
+                    }
+                </td>
                 <td>@warehouse.CreatedAt.ToString("yyyy-MM-dd")</td>
                 <td>@(warehouse.UpdatedAt.HasValue ? warehouse.UpdatedAt.Value.ToString("yyyy-MM-dd") : "-")</td>
                 <td>

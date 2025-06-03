@@ -28,6 +28,7 @@ namespace Inventory_Management_System.Models
         public DbSet<Warehouse> Warehouses { get; set; }
         public DbSet<WarehouseProduct> WarehouseProducts { get; set; }
         public DbSet<ProductTransferItem> ProductTransferItems { get; set; } // Detail
+        public DbSet<Manager> Managers { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -182,6 +183,11 @@ namespace Inventory_Management_System.Models
                 .HasOne(wp => wp.Supplier)
                 .WithMany(s => s.WarehouseProducts)
                 .HasForeignKey(wp => wp.SupplierId);
+
+            modelBuilder.Entity<Warehouse>()
+                .HasOne(w => w.Manager)           // A Warehouse has one Manager
+                .WithMany()                       // A Manager can have many Warehouses (no direct navigation property on Manager side needed if only one direction is used)
+                .HasForeignKey(w => w.ManagerId);
         }
     }
 }

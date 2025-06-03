@@ -1,76 +1,220 @@
 ﻿@model IEnumerable<Inventory_Management_System.Models.ProductTransfer>
 
 @{
-    ViewData["Title"] = "Product Transfers List";
+    ViewData["Title"] = "تحويلات المنتجات";
 }
 
-<h1>Product Transfers List</h1>
-
-<p>
-    <a asp-action="Create" class="btn btn-primary">Create New Transfer</a>
-</p>
-
-@if (Model != null && Model.Any())
-{
-    <table class="table table-striped table-bordered">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.TransferNumber)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.TransferDate)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.SourceWarehouse)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.DestinationWarehouse)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.CreatedAt)
-                </th>
-                <th></th> @* For Action Links (Details, Edit, Delete - though Edit/Delete might be complex for transfers) *@
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
+<div class="container-fluid mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">تحويلات المنتجات</h4>
+            <a asp-action="Create" class="btn btn-success">
+                <i class="fas fa-plus"></i> تحويل جديد
+            </a>
+        </div>
+        <div class="card-body">
+            @if (TempData["SuccessMessage"] != null)
             {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.TransferNumber)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.TransferDate)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.SourceWarehouse.Name)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.DestinationWarehouse.Name)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.CreatedAt)
-                    </td>
-                    <td>
-                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Details</a>
-                        @* Edit/Delete might be complex for transfers involving inventory movements,
-                           so typically you'd only allow viewing details or reversing the transfer.
-                           <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                           <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> *@
-                    </td>
-                </tr>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             }
-        </tbody>
-    </table>
-}
-else
-{
-    <div class="alert alert-info mt-4" role="alert">
-        No product transfers recorded yet.
-    </div>
-}
 
-<div>
-    <a asp-controller="Home" asp-action="Index">Back to Home</a>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>رقم التحويل</th>
+                            <th>تاريخ التحويل</th>
+                            <th>من مخزن</th>
+                            <th>إلى مخزن</th>
+                            <th>عدد الأصناف</th>
+                            <th>إجمالي الكميات</th>
+                            <th>تاريخ الإنشاء</th>
+                            <th>تفاصيل</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var transfer in Model)
+                            {
+                                <tr>
+                                    <td>@transfer.TransferNumber</td>
+                                    <td>@transfer.TransferDate.ToShortDateString()</td>
+                                    <td>@transfer.SourceWarehouse?.Name</td>
+                                    <td>@transfer.DestinationWarehouse?.Name</td>
+                                    <td>@transfer.Items?.Count()</td>
+                                    <td>@transfer.Items?.Sum(i => i.Quantity)</td>
+                                    <td>@transfer.CreatedAt.ToLocalTime().ToString("g")</td>
+                                    <td>
+                                        <button type="button" class="btn btn-info btn-sm view-details" 
+                                                data-transfer-id="@transfer.Id"
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#detailsModal">
+                                            <i class="fas fa-eye"></i> عرض
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="8" class="text-center text-muted">
+                                    <i class="fas fa-inbox fa-2x mb-2"></i>
+                                    <p>لا توجد تحويلات مسجلة</p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Details Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-info-circle"></i> تفاصيل التحويل
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="transfer-info"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="warehouse-info"></div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>المنتج</th>
+                                <th>المورد</th>
+                                <th>تاريخ الإنتاج</th>
+                                <th>فترة الصلاحية</th>
+                                <th>الكمية</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> إغلاق
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <script>
+        $(document).ready(function () {
+            // Handle view details button click
+            $('.view-details').click(function () {
+                const transferId = $(this).data('transfer-id');
+                loadTransferDetails(transferId);
+            });
+
+            function loadTransferDetails(transferId) {
+                // Show loading state
+                $('#detailsTableBody').html(`
+                    <tr>
+                        <td colspan="5" class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">جاري التحميل...</span>
+                            </div>
+                        </td>
+                    </tr>
+                `);
+
+                // Load transfer details
+                $.get(`/ProductTransfer/GetDetails/${transferId}`)
+                    .done(function (data) {
+                        // Update transfer info
+                        $('.transfer-info').html(`
+                            <h6>معلومات التحويل</h6>
+                            <p><strong>رقم التحويل:</strong> ${data.transferNumber}</p>
+                            <p><strong>تاريخ التحويل:</strong> ${new Date(data.transferDate).toLocaleDateString()}</p>
+                            <p><strong>تاريخ الإنشاء:</strong> ${new Date(data.createdAt).toLocaleString()}</p>
+                        `);
+
+                        // Update warehouse info
+                        $('.warehouse-info').html(`
+                            <h6>معلومات المخازن</h6>
+                            <p><strong>من مخزن:</strong> ${data.sourceWarehouseName}</p>
+                            <p><strong>إلى مخزن:</strong> ${data.destinationWarehouseName}</p>
+                        `);
+
+                        // Update items table
+                        let tableHtml = '';
+                        data.items.forEach(function (item) {
+                            tableHtml += `
+                                <tr>
+                                    <td>${item.productName}</td>
+                                    <td>${item.supplierName}</td>
+                                    <td>${new Date(item.productionDate).toLocaleDateString()}</td>
+                                    <td>${item.expiryPeriodInDays} يوم</td>
+                                    <td>${item.quantity}</td>
+                                </tr>
+                            `;
+                        });
+                        $('#detailsTableBody').html(tableHtml);
+                    })
+                    .fail(function (error) {
+                        $('#detailsTableBody').html(`
+                            <tr>
+                                <td colspan="5" class="text-center text-danger">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    حدث خطأ أثناء تحميل التفاصيل
+                                </td>
+                            </tr>
+                        `);
+                        console.error('Error:', error);
+                    });
+            }
+        });
+    </script>
+
+    <style>
+        .table th {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .table td {
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .modal-header .btn-close {
+            filter: brightness(0) invert(1);
+        }
+
+        .transfer-info, .warehouse-info {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 0.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .transfer-info h6, .warehouse-info h6 {
+            color: #0d6efd;
+            margin-bottom: 1rem;
+        }
+    </style>
+}
