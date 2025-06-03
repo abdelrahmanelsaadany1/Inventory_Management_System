@@ -1,0 +1,103 @@
+﻿@model Inventory_Management_System.ViewModels.ProductMovementReportResultViewModel
+
+@{
+    ViewData["Title"] = "Product Movement Report Result";
+}
+
+<h1>Product Movement Report Result</h1>
+
+<div class="card mb-4">
+    <div class="card-header">
+        Report Parameters
+    </div>
+    <div class="card-body">
+        <p><strong>Start Date:</strong> @Model.ReportParameters.StartDate.ToShortDateString()</p>
+        <p><strong>End Date:</strong> @Model.ReportParameters.EndDate.ToShortDateString()</p>
+        <p>
+            <strong>Warehouses:</strong>
+            @if (Model.ReportParameters.SelectedWarehouseIds != null && Model.ReportParameters.SelectedWarehouseIds.Any())
+            {
+                foreach (var warehouseId in Model.ReportParameters.SelectedWarehouseIds)
+                {
+                    var warehouse = Model.ReportParameters.AvailableWarehouses.FirstOrDefault(w => w.Id == warehouseId);
+                    if (warehouse != null)
+                    {
+                        <span>@warehouse.Name @(Model.ReportParameters.SelectedWarehouseIds.Last() == warehouseId ? "" : ",") </span>
+                    }
+                }
+            }
+            else
+            {
+                <span>All selected warehouses.</span>
+            }
+        </p>
+    </div>
+</div>
+
+@if (Model.MovementItems == null || !Model.MovementItems.Any())
+{
+    <div class="alert alert-warning" role="alert">
+        No product movements found for the selected criteria.
+    </div>
+}
+else
+{
+    <h2>Movement Details</h2>
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Warehouse</th>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Reference</th>
+                <th>Quantity</th>
+                <th>Related Party</th>
+                <th>Prod. Date</th>
+                <th>Expiry Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.MovementItems)
+            {
+                <tr>
+                    <td>@item.ProductName (@item.ProductCode)</td>
+                    <td>@item.WarehouseName</td>
+                    <td>@item.MovementDate.ToShortDateString()</td>
+                    <td>@item.MovementType</td>
+                    <td>@item.ReferenceNumber</td>
+                    <td>@item.Quantity</td>
+                    <td>@item.RelatedParty</td>
+                    <td>@(item.ProductionDate?.ToShortDateString())</td>
+                    <td>@(item.ExpiryDate?.ToShortDateString())</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (Model.ProductSummary != null && Model.ProductSummary.Any())
+    {
+        <h2>Product Summary (Net Movement)</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Net Quantity Change</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var entry in Model.ProductSummary)
+                {
+                    <tr>
+                        <td>@entry.Key</td>
+                        <td>@entry.Value</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+<div>
+    <a asp-action="ProductMovement" class="btn btn-secondary">Back to Report Selection</a>
+</div>

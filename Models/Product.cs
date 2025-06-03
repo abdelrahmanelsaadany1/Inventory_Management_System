@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Inventory_Management_System.Models
 {
@@ -21,6 +22,9 @@ namespace Inventory_Management_System.Models
         [JsonIgnore]
         public ICollection<ProductTransfer> ProductTransfers { get; set; } = new HashSet<ProductTransfer>();
 
+        [Display(Name = "Default Expiry Period (Days)")]
+        [Range(0, int.MaxValue, ErrorMessage = "Expiry period must be 0 or greater.")]
+        public int ExpiryPeriodInDays { get; set; }
 
     }
 }

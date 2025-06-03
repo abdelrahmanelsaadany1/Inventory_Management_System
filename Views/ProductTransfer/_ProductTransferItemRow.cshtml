@@ -1,0 +1,61 @@
+﻿@model Inventory_Management_System.ViewModels.ProductTransferItemViewModel
+
+@{
+    int index = (int)ViewData["Index"];
+}
+
+<div class="product-item-row border p-3 mb-3" data-index="@index">
+    <h5 class="mb-3">Item #<span class="item-number">@(index + 1)</span></h5>
+    <input type="hidden" name="Items[@index].Index" value="@index" />
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="ProductId" class="control-label"></label>
+                <select asp-for="ProductId" name="Items[@index].ProductId" class="form-control product-dropdown"
+                        asp-items="@((SelectList)ViewData["AllProducts"])">
+                    <option value="">-- Select Product --</option>
+                </select>
+                @* <span asp-validation-for="ProductId" class="text-danger"></span> *@
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="Quantity" class="control-label"></label>
+                <input asp-for="Quantity" name="Items[@index].Quantity" type="number" class="form-control" min="1" />
+                @* <span asp-validation-for="Quantity" class="text-danger"></span> *@
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="SupplierId" class="control-label"></label>
+                <select asp-for="SupplierId" name="Items[@index].SupplierId" class="form-control"
+                        asp-items="@((SelectList)ViewData["AllSuppliers"])">
+                    <option value="">-- Select Supplier --</option>
+                </select>
+                @* <span asp-validation-for="SupplierId" class="text-danger"></span> *@
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="ProductionDate" class="control-label"></label>
+                <input asp-for="ProductionDate" name="Items[@index].ProductionDate" type="date" class="form-control" />
+                @* <span asp-validation-for="ProductionDate" class="text-danger"></span> *@
+            </div>
+        </div>
+        @* {{EXPIRY_PERIOD_INPUT}} is a placeholder for the JavaScript template, but not directly used here *@
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="ExpiryPeriodInDays" class="control-label"></label>
+                <input asp-for="ExpiryPeriodInDays" name="Items[@index].ExpiryPeriodInDays" type="number" class="form-control" min="0" />
+                @* <span asp-validation-for="ExpiryPeriodInDays" class="text-danger"></span> *@
+            </div>
+        </div>
+        <div class="col-md-4 align-self-end">
+            <button type="button" class="btn btn-danger remove-item-button">Remove</button>
+        </div>
+    </div>
+</div>

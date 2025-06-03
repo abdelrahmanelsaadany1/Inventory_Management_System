@@ -31,6 +31,6 @@ namespace Inventory_Management_System.Models
 
         [Required(ErrorMessage = "Expiry period is required for the product batch.")]
         [Range(1, int.MaxValue, ErrorMessage = "Expiry period must be greater than 0.")]
-        public int ExpiryPeriodInDays { get; set; }
+       public int ExpiryPeriodInDays { get; set; }
     }
 }

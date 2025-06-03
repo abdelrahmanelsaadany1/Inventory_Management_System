@@ -1,162 +1,509 @@
-﻿@model Inventory_Management_System.ViewModels.AddProductTransferViewModel
+﻿@model Inventory_Management_System.ViewModels.ProductTransferCreateViewModel
 
 @{
     ViewData["Title"] = "Create Product Transfer";
 }
 
-<h2>Create Product Transfer</h2>
+<h1>Create Product Transfer</h1>
 
-<form asp-action="Create" method="post">
-    <div class="form-group">
-        <label asp-for="TransferNumber"></label>
-        <input asp-for="TransferNumber" class="form-control" />
-        <span asp-validation-for="TransferNumber" class="text-danger"></span>
-    </div>
+<h4>Transfer Details</h4>
+<hr />
+<div class="row">
+    <div class="col-md-12">
+        <form asp-action="Create" method="post">
+            @* COMMENT OUT VALIDATION SUMMARY *@
+            @* <div asp-validation-summary="All" class="text-danger"></div> *@
 
-    <div class="form-group">
-        <label asp-for="TransferDate"></label>
-        <input asp-for="TransferDate" class="form-control" type="date" />
-        <span asp-validation-for="TransferDate" class="text-danger"></span>
-    </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label asp-for="TransferNumber" class="control-label"></label>
+                        <input asp-for="TransferNumber" class="form-control" />
+                        @* COMMENT OUT VALIDATION SPAN *@
+                        @* <span asp-validation-for="TransferNumber" class="text-danger"></span> *@
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label asp-for="TransferDate" class="control-label"></label>
+                        <input asp-for="TransferDate" type="date" class="form-control" />
+                        @* COMMENT OUT VALIDATION SPAN *@
+                        @* <span asp-validation-for="TransferDate" class="text-danger"></span> *@
+                    </div>
+                </div>
+            </div>
 
-    <div class="form-group">
-        <label asp-for="SourceWarehouseId">Source Warehouse</label>
-        <select asp-for="SourceWarehouseId" class="form-control" id="sourceWarehouse">
-            <option value="">-- Select Source Warehouse --</option>
-            @foreach (var warehouse in Model.Warehouses)
-            {
-                <option value="@warehouse.Id">@warehouse.Name</option>
-            }
-        </select>
-        <span asp-validation-for="SourceWarehouseId" class="text-danger"></span>
-    </div>
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label asp-for="SourceWarehouseId" class="control-label"></label>
+                        <select asp-for="SourceWarehouseId" asp-items="Model.AllWarehouses" class="form-control" id="sourceWarehouseDropdown">
+                            <option value="">-- Select Source Warehouse --</option>
+                        </select>
+                        @* COMMENT OUT VALIDATION SPAN *@
+                        @* <span asp-validation-for="SourceWarehouseId" class="text-danger"></span> *@
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label asp-for="DestinationWarehouseId" class="control-label"></label>
+                        <select asp-for="DestinationWarehouseId" asp-items="Model.AllWarehouses" class="form-control">
+                            <option value="">-- Select Destination Warehouse --</option>
+                        </select>
+                        @* COMMENT OUT VALIDATION SPAN *@
+                        @* <span asp-validation-for="DestinationWarehouseId" class="text-danger"></span> *@
+                    </div>
+                </div>
+            </div>
 
-    <div class="form-group">
-        <label asp-for="DestinationWarehouseId">Destination Warehouse</label>
-        <select asp-for="DestinationWarehouseId" class="form-control">
-            <option value="">-- Select Destination Warehouse --</option>
-            @foreach (var warehouse in Model.Warehouses)
-            {
-                <option value="@warehouse.Id">@warehouse.Name</option>
-            }
-        </select>
-        <span asp-validation-for="DestinationWarehouseId" class="text-danger"></span>
-    </div>
+            <h4 class="mt-4">Available Products for Transfer</h4>
+            <hr />
 
-    <hr />
-    <h4>Transfer Items</h4>
+            <div id="availableProductsContainer" class="mb-4" style="min-height: 100px;">
+                <p class="text-muted" id="initialAvailableProductsMessage">Select a Source Warehouse to view available products.</p>
+                <div id="loadingProductsMessage" class="d-none">Loading products...</div>
+                <table class="table table-bordered table-striped d-none" id="availableProductsTable">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Supplier</th>
+                            <th>Production Date</th>
+                            <th>Available Quantity</th>
+                            <th>Expiry (Days)</th>
+                            <th>Quantity to Transfer</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="availableProductsTableBody">
+                        @* Products will be dynamically added here by JavaScript *@
+                    </tbody>
+                </table>
+                <p class="text-danger d-none" id="noProductsFoundMessage">No products found in the selected warehouse or all products have 0 quantity.</p>
+            </div>
 
-    <div id="items-container"></div>
+            <h4 class="mt-4">Selected Items for Transfer</h4>
+            <hr />
+            <div id="selectedItemsContainer">
+                <p class="text-muted" id="noSelectedItemsMessage">No products selected for transfer.</p>
+                @* Selected items will be dynamically added here by JavaScript *@
+            </div>
 
-    <button type="button" class="btn btn-secondary mb-3" onclick="addItem()">Add Item</button>
-
-    <button type="submit" class="btn btn-primary">Create Transfer</button>
-</form>
-
-<!-- Hidden row template -->
-<div id="item-template" class="d-none">
-    <div class="item-row border p-3 mb-3" data-index="__index__">
-        <h5>Item #<span class="item-number">__index__</span></h5>
-
-        <div class="form-group">
-            <label>Product</label>
-            <select name="Items[__index__].ProductId" class="form-control product-select" required></select>
-        </div>
-
-        <div class="form-group">
-            <label>Quantity</label>
-            <input name="Items[__index__].Quantity" class="form-control" type="number" min="1" required />
-        </div>
-
-        <div class="form-group">
-            <label>Supplier</label>
-            <select name="Items[__index__].SupplierId" class="form-control supplier-select" required></select>
-        </div>
-
-        <div class="form-group">
-            <label>Production Date</label>
-            <input name="Items[__index__].ProductionDate" class="form-control" type="date" required />
-        </div>
-
-        <div class="form-group">
-            <label>Expiry Period (Days)</label>
-            <input name="Items[__index__].ExpiryPeriodInDays" class="form-control" type="number" min="0" required />
-        </div>
-
-        <button type="button" class="btn btn-danger" onclick="removeItem(this)">Remove</button>
-        <hr />
+            <div class="form-group mt-4">
+                <input type="submit" value="Create Transfer" class="btn btn-primary" />
+            </div>
+        </form>
     </div>
 </div>
-@section Scripts {
-    <script>
-        let itemIndex = 0;
-        let warehouseInventory = [];
 
-        // Load inventory when source warehouse changes
-        document.getElementById("sourceWarehouse").addEventListener("change", function () {
-            const warehouseId = this.value;
+<div>
+    <a asp-action="Index">Back to Transfer List</a>
+</div>
+
+<style>
+    #availableProductsContainer {
+        transition: all 0.3s ease;
+    }
+
+    .d-none {
+        display: none !important;
+    }
+
+    /* Ensure smooth show/hide transitions */
+    #initialAvailableProductsMessage,
+    #loadingProductsMessage,
+    #noProductsFoundMessage {
+        transition: opacity 0.2s ease;
+    }
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+    // Global index for unique names/IDs for selected items
+    var itemIndex = @(Model.Items?.Count() ?? 0);
+
+    // A client-side cache to keep track of available products and their quantities.
+    var availableProductsCache = {}; // Key: productId-supplierId-productionDate, Value: product object
+
+    $(document).ready(function () {
+        var $sourceWarehouseDropdown = $('#sourceWarehouseDropdown');
+        var $initialAvailableProductsMessage = $('#initialAvailableProductsMessage');
+        var $loadingProductsMessage = $('#loadingProductsMessage');
+        var $noProductsFoundMessage = $('#noProductsFoundMessage');
+        var $availableProductsTable = $('#availableProductsTable');
+        var $availableProductsTableBody = $('#availableProductsTableBody');
+
+        var $noSelectedItemsMessage = $('#noSelectedItemsMessage');
+        var $selectedItemsContainer = $('#selectedItemsContainer');
+
+        // Function to render a row in the AVAILABLE PRODUCTS table
+        function renderAvailableProductRow(product) {
+            var productionDateFormatted = new Date(product.productionDate).toLocaleDateString();
+            var productionDateIso = new Date(product.productionDate).toISOString().split('T')[0]; // For data attribute consistency
+
+            return `
+                <tr data-product-key="${product.productId}-${product.supplierId}-${productionDateIso}">
+                    <td>${product.productName}</td>
+                    <td>${product.supplierName}</td>
+                    <td>${productionDateFormatted}</td>
+                    <td class="available-qty">${product.quantity}</td>
+                    <td>${product.expiryPeriodInDays}</td>
+                    <td>
+                        <input type="number" class="form-control quantity-to-transfer"
+                               min="1" max="${product.quantity}" value="1"
+                               data-product-id="${product.productId}"
+                               data-supplier-id="${product.supplierId}"
+                               data-production-date="${productionDateIso}"
+                               data-expiry-period="${product.expiryPeriodInDays}"
+                               data-available-qty="${product.quantity}"
+                               data-product-name="${product.productName}"
+                               data-supplier-name="${product.supplierName}"
+                               ${product.quantity <= 0 ? 'disabled' : ''}
+                        />
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-success add-transfer-item-button"
+                                ${product.quantity <= 0 ? 'disabled' : ''}>Add</button>
+                    </td>
+                </tr>`;
+        }
+
+        // Function to render a row in the SELECTED ITEMS container
+        function renderSelectedProductDiv(item, index) {
+            var productionDateFormatted = new Date(item.productionDate).toLocaleDateString();
+            var productionDateIso = new Date(item.productionDate).toISOString().split('T')[0];
+
+            return `
+                <div class="selected-product-row border p-3 mb-2 bg-light rounded" data-item-index="${index}" data-product-key="${item.productId}-${item.supplierId}-${productionDateIso}">
+                    <h6 class="mb-2">Item #<span class="item-number">${index + 1}</span> - ${item.productName} (${item.supplierName}) - ${productionDateFormatted}</h6>
+                    <div class="row align-items-center">
+                        <div class="col-md-3">
+                            <label>Product ID:</label>
+                            <input type="text" class="form-control-plaintext" value="${item.productId}" readonly />
+                            <input type="hidden" name="Items[${index}].ProductId" value="${item.productId}" />
+                            <input type="hidden" name="Items[${index}].ProductName" value="${item.productName}" />
+                        </div>
+                        <div class="col-md-3">
+                            <label>Supplier ID:</label>
+                            <input type="text" class="form-control-plaintext" value="${item.supplierId}" readonly />
+                            <input type="hidden" name="Items[${index}].SupplierId" value="${item.supplierId}" />
+                            <input type="hidden" name="Items[${index}].SupplierName" value="${item.supplierName}" />
+                        </div>
+                        <div class="col-md-3">
+                            <label>Production Date:</label>
+                            <input type="text" class="form-control-plaintext" value="${productionDateFormatted}" readonly />
+                            <input type="hidden" name="Items[${index}].ProductionDate" value="${productionDateIso}" />
+                        </div>
+                        <div class="col-md-3">
+                            <label>Transfer Quantity:</label>
+                            <input type="number" name="Items[${index}].Quantity" class="form-control transfer-qty-input"
+                                   value="${item.quantity}" min="1" required
+                                   data-product-id="${item.productId}"
+                                   data-supplier-id="${item.supplierId}"
+                                   data-production-date="${productionDateIso}"
+                            />
+                        </div>
+                        <input type="hidden" name="Items[${index}].ExpiryPeriodInDays" value="${item.expiryPeriodInDays}" />
+                        <input type="hidden" name="Items[${index}].Index" value="${index}" />
+                        <div class="col-md-12 text-end mt-2">
+                            <button type="button" class="btn btn-sm btn-danger remove-selected-item-button">Remove</button>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        // Function to update item indexes in the SELECTED ITEMS container (after removal)
+        function updateSelectedItemsIndexes() {
+            $selectedItemsContainer.find('.selected-product-row').each(function (i) {
+                var $row = $(this);
+                $row.attr('data-item-index', i);
+                $row.find('.item-number').text(i + 1);
+                $row.find('input[name^="Items["]').each(function () {
+                    var currentName = $(this).attr('name');
+                    var newName = currentName.replace(/\[\d+\]/g, '[' + i + ']');
+                    $(this).attr('name', newName);
+                });
+            });
+            itemIndex = $selectedItemsContainer.find('.selected-product-row').length;
+            if (itemIndex === 0) {
+                $noSelectedItemsMessage.removeClass('d-none').show();
+            } else {
+                $noSelectedItemsMessage.addClass('d-none').hide();
+            }
+        }
+
+        // Function to load and display products for the selected source warehouse
+        // Added `clearSelectedItems` flag to control clearing behavior
+        function loadAvailableProducts(clearSelectedItems = true) {
+            var warehouseId = $sourceWarehouseDropdown.val();
+
+            // Clear previous cache and UI state for available products
+            availableProductsCache = {};
+            $initialAvailableProductsMessage.addClass('d-none').hide();
+            $loadingProductsMessage.addClass('d-none').hide();
+            $noProductsFoundMessage.addClass('d-none').hide();
+            $availableProductsTable.addClass('d-none');
+            $availableProductsTableBody.empty(); // Clear previous products
+
+            if (clearSelectedItems) { // ONLY clear selected items if this flag is true (i.e., user manually changed dropdown)
+                $selectedItemsContainer.empty();
+                itemIndex = 0;
+                updateSelectedItemsIndexes();
+            }
+
             if (warehouseId) {
-                fetch(`/ProductTransfer/GetWarehouseInventory?warehouseId=${warehouseId}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        warehouseInventory = data;
-                        alert("Warehouse inventory loaded. You can now add items.");
-                    });
+                $loadingProductsMessage.removeClass('d-none').show();
+
+                $.ajax({
+                    url: '@Url.Action("GetWarehouseProducts", "ProductTransfer")',
+                    type: 'GET',
+                    data: { warehouseId: warehouseId },
+                    success: function (data) {
+                        $loadingProductsMessage.addClass('d-none').hide();
+                        if (data && data.length > 0) {
+                            // Populate the cache and render rows
+                            $.each(data, function (idx, product) {
+                                var productionDateIso = new Date(product.productionDate).toISOString().split('T')[0];
+                                var productKey = `${product.productId}-${product.supplierId}-${productionDateIso}`;
+
+                                // Adjust product quantity based on what's already selected
+                                var selectedQuantityForThisProduct = 0;
+                                $selectedItemsContainer.find(`div[data-product-key="${productKey}"]`).each(function() {
+                                    selectedQuantityForThisProduct += parseInt($(this).find('.transfer-qty-input').val() || 0);
+                                });
+
+                                var remainingQuantity = product.quantity - selectedQuantityForThisProduct;
+
+                                if (remainingQuantity > 0) {
+                                    availableProductsCache[productKey] = { ...product, quantity: remainingQuantity }; // Store adjusted quantity
+                                    $availableProductsTableBody.append(renderAvailableProductRow(availableProductsCache[productKey]));
+                                } else {
+                                    // If all quantity is selected, don't add to available list
+                                    availableProductsCache[productKey] = { ...product, quantity: 0 }; // Still cache with 0 for tracking
+                                }
+                            });
+
+                            if ($availableProductsTableBody.find('tr').length > 0) {
+                                $availableProductsTable.removeClass('d-none');
+                            } else {
+                                $noProductsFoundMessage.text("No unique products available for transfer in the selected warehouse.").removeClass('d-none').show();
+                            }
+
+                        } else {
+                            $noProductsFoundMessage.removeClass('d-none').show();
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        $loadingProductsMessage.addClass('d-none').hide();
+                        $noProductsFoundMessage.text("Error loading products: " + error).removeClass('d-none').show();
+                        console.error("Error loading warehouse products:", error);
+                    }
+                });
+            } else {
+                $initialAvailableProductsMessage.removeClass('d-none').show();
+            }
+        }
+
+        // Event listener for Source Warehouse dropdown change
+        // This explicitly calls loadAvailableProducts with clearSelectedItems = true
+        $sourceWarehouseDropdown.on('change', function() {
+            loadAvailableProducts(true);
+        });
+
+        // Handle adding product to transfer list
+        $(document).on('click', '.add-transfer-item-button', function () {
+            var $row = $(this).closest('tr');
+            var $qtyInput = $row.find('.quantity-to-transfer');
+            var quantityToTransfer = parseInt($qtyInput.val());
+            var productKey = $row.data('product-key');
+
+            var currentProductInCache = availableProductsCache[productKey];
+            var actualAvailableQuantity = currentProductInCache ? currentProductInCache.quantity : 0;
+
+            if (isNaN(quantityToTransfer) || quantityToTransfer <= 0 || quantityToTransfer > actualAvailableQuantity) {
+                alert('Please enter a valid quantity between 1 and ' + actualAvailableQuantity + '.');
+                return;
+            }
+
+            var item = {
+                productId: $qtyInput.data('product-id'),
+                productName: $qtyInput.data('product-name'),
+                supplierId: $qtyInput.data('supplier-id'),
+                supplierName: $qtyInput.data('supplier-name'),
+                productionDate: $qtyInput.data('production-date'),
+                expiryPeriodInDays: $qtyInput.data('expiry-period'),
+                quantity: quantityToTransfer
+            };
+
+            $selectedItemsContainer.append(renderSelectedProductDiv(item, itemIndex));
+            itemIndex++;
+            updateSelectedItemsIndexes();
+
+            if (currentProductInCache) {
+                currentProductInCache.quantity -= quantityToTransfer;
+                if (currentProductInCache.quantity <= 0) {
+                    delete availableProductsCache[productKey]; // Remove from cache if fully transferred
+                    $row.remove(); // Remove row from available table
+                } else {
+                    $row.find('.available-qty').text(currentProductInCache.quantity);
+                    $qtyInput.attr('max', currentProductInCache.quantity).val(1);
+                    $qtyInput.data('available-qty', currentProductInCache.quantity);
+                    $qtyInput.prop('disabled', false);
+                    $row.find('.add-transfer-item-button').prop('disabled', false);
+                }
+            }
+
+            if ($availableProductsTableBody.find('tr:visible').length === 0) {
+                $availableProductsTable.addClass('d-none');
+                $noProductsFoundMessage.text("No more products available for transfer in the selected warehouse.").removeClass('d-none').show();
             }
         });
 
-        function addItem() {
-            const container = document.getElementById("items-container");
-            const template = document.getElementById("item-template").innerHTML.replace(/__index__/g, itemIndex);
-            container.insertAdjacentHTML("beforeend", template);
+        // Handle removing selected item from transfer list
+        $(document).on('click', '.remove-selected-item-button', function () {
+            var $row = $(this).closest('.selected-product-row');
+            var removedProductKey = $row.data('product-key');
+            var removedQuantity = parseInt($row.find('.transfer-qty-input').val());
+            var productId = $row.find('.transfer-qty-input').data('product-id');
+            var supplierId = $row.find('.transfer-qty-input').data('supplier-id');
+            var productionDate = $row.find('.transfer-qty-input').data('production-date');
+            var expiryPeriod = $row.find('input[name$=".ExpiryPeriodInDays"]').val();
+            var productName = $row.find('input[name$=".ProductName"]').val(); // Use hidden input for accuracy
+            var supplierName = $row.find('input[name$=".SupplierName"]').val(); // Use hidden input for accuracy
 
-            const row = container.querySelector(`.item-row[data-index="${itemIndex}"]`);
-            const productSelect = row.querySelector(".product-select");
-            const supplierSelect = row.querySelector(".supplier-select");
-
-            const uniqueCombinations = [...new Map(warehouseInventory.map(item => [
-                `${item.ProductId}-${item.SupplierId}-${item.ProductionDate}`,
-                item
-            ])).values()];
-
-            uniqueCombinations.forEach(item => {
-                const optionText = `${item.ProductName} (Supplier: ${item.SupplierName}, Date: ${item.ProductionDate})`;
-                productSelect.innerHTML += `<option value="${item.ProductId}"
-                    data-supplier-id="${item.SupplierId}"
-                    data-supplier-name="${item.SupplierName}"
-                    data-date="${item.ProductionDate}"
-                    data-expiry="${item.ExpiryPeriodInDays}">${optionText}</option>`;
-            });
-
-            productSelect.addEventListener("change", function () {
-                const selectedOption = this.selectedOptions[0];
-                if (selectedOption && selectedOption.value) {
-                    // Auto-fill production date and expiry period
-                    row.querySelector("input[name$='ProductionDate']").value = selectedOption.getAttribute("data-date");
-                    row.querySelector("input[name$='ExpiryPeriodInDays']").value = selectedOption.getAttribute("data-expiry");
-
-                    // Populate supplier dropdown with the correct supplier
-                    const supplierId = selectedOption.getAttribute("data-supplier-id");
-                    const supplierName = selectedOption.getAttribute("data-supplier-name");
-
-                    supplierSelect.innerHTML = `<option value="">-- Select Supplier --</option>`;
-                    supplierSelect.innerHTML += `<option value="${supplierId}" selected>${supplierName}</option>`;
+            if (availableProductsCache[removedProductKey]) {
+                availableProductsCache[removedProductKey].quantity += removedQuantity;
+                var $availableRow = $availableProductsTableBody.find(`tr[data-product-key="${removedProductKey}"]`);
+                if ($availableRow.length > 0) {
+                    // Update existing row in available table
+                    $availableRow.find('.available-qty').text(availableProductsCache[removedProductKey].quantity);
+                    $availableRow.find('.quantity-to-transfer').attr('max', availableProductsCache[removedProductKey].quantity).val(1);
+                    $availableRow.find('.quantity-to-transfer').data('available-qty', availableProductsCache[removedProductKey].quantity);
+                    $availableRow.find('.quantity-to-transfer').prop('disabled', false);
+                    $availableRow.find('.add-transfer-item-button').prop('disabled', false);
+                    $availableRow.show(); // Ensure it's visible if it was hidden
                 } else {
-                    // Clear fields if no product selected
-                    row.querySelector("input[name$='ProductionDate']").value = "";
-                    row.querySelector("input[name$='ExpiryPeriodInDays']").value = "";
-                    supplierSelect.innerHTML = `<option value="">-- Select Supplier --</option>`;
+                    // Re-add to available table if it was previously removed
+                    var productToReadd = {
+                        productId: productId,
+                        productName: productName,
+                        supplierId: supplierId,
+                        supplierName: supplierName,
+                        productionDate: productionDate,
+                        expiryPeriodInDays: expiryPeriod,
+                        quantity: availableProductsCache[removedProductKey].quantity // Use updated quantity from cache
+                    };
+                    $availableProductsTableBody.append(renderAvailableProductRow(productToReadd));
                 }
+            } else {
+                // If product was completely removed from cache (because quantity was 0), re-add it fully
+                var productToReadd = {
+                    productId: productId,
+                    productName: productName,
+                    supplierId: supplierId,
+                    supplierName: supplierName,
+                    productionDate: productionDate,
+                    expiryPeriodInDays: expiryPeriod,
+                    quantity: removedQuantity // Initial quantity being put back
+                };
+                availableProductsCache[removedProductKey] = productToReadd; // Add back to cache
+                $availableProductsTableBody.append(renderAvailableProductRow(productToReadd));
+            }
+
+            $row.remove(); // Remove from selected items
+            updateSelectedItemsIndexes(); // Re-index selected items
+
+            // Re-evaluate display of available products table messages
+            if ($availableProductsTableBody.find('tr').length > 0) {
+                $availableProductsTable.removeClass('d-none');
+                $noProductsFoundMessage.addClass('d-none').hide();
+            } else {
+                $availableProductsTable.addClass('d-none');
+                $noProductsFoundMessage.text("No more products available for transfer in the selected warehouse.").removeClass('d-none').show();
+            }
+        });
+
+        // Handle quantity change for selected items
+        $(document).on('change keyup', '.transfer-qty-input', function () {
+            var $input = $(this);
+            var currentQuantity = parseInt($input.val());
+
+            if (isNaN(currentQuantity) || currentQuantity <= 0) {
+                $input.val(1);
+            }
+        });
+
+        // Initial page load logic:
+        // This block handles the initial state and re-populating selected items on postback.
+    @if (Model.Items != null && Model.Items.Any())
+    {
+        <text>
+                    $selectedItemsContainer.empty(); // Clear any initial Razor-rendered items
+        </text>
+        @foreach (var item in Model.Items)
+        {
+            var productsList = Model.AllProducts as IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>;
+            var suppliersList = Model.AllSuppliers as IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>;
+
+            var productName = (productsList?.FirstOrDefault(p => p.Value == item.ProductId.ToString())?.Text) ?? "Unknown Product";
+            var supplierName = (suppliersList?.FirstOrDefault(s => s.Value == item.SupplierId.ToString())?.Text) ?? "Unknown Supplier";
+
+            var jsonItem = System.Text.Json.JsonSerializer.Serialize(new
+            {
+                ProductId = item.ProductId,
+                ProductName = productName,
+                SupplierId = item.SupplierId,
+                SupplierName = supplierName,
+                ProductionDate = item.ProductionDate.ToString("yyyy-MM-dd"),
+                ExpiryPeriodInDays = item.ExpiryPeriodInDays,
+                Quantity = item.Quantity
             });
-
-            itemIndex++;
+            @: $selectedItemsContainer.append(renderSelectedProductDiv(@Html.Raw(jsonItem), itemIndex));
+            @: itemIndex++;
         }
+        <text>
+                    updateSelectedItemsIndexes(); // Ensure correct visibility and indexing for the re-populated items
+        </text>
+    }
 
-        function removeItem(button) {
-            const row = button.closest(".item-row");
-            row.remove();
+        // FIXED: Check if source warehouse is selected on page load and load products accordingly
+        // This needs to happen AFTER selected items are populated
+        setTimeout(function() {
+            var selectedWarehouseId = $sourceWarehouseDropdown.val();
+            console.log('Selected warehouse ID on page load:', selectedWarehouseId);
+            
+            if (selectedWarehouseId && selectedWarehouseId !== "" && selectedWarehouseId !== "0") {
+                // If we have selected items, don't clear them when loading available products
+                var hasSelectedItems = @(Model.Items != null && Model.Items.Any() ? "true" : "false");
+                console.log('Has selected items:', hasSelectedItems);
+
+                // Hide the initial message since we have a warehouse selected
+                $initialAvailableProductsMessage.addClass('d-none').hide();
+                
+                if (hasSelectedItems) {
+                    // Load available products but don't clear selected items
+                    loadAvailableProducts(false);
+                } else {
+                    // No selected items, so we can clear and load normally
+                    loadAvailableProducts(true);
+                }
+            } else {
+                // No warehouse selected
+        @if (Model.Items == null || !Model.Items.Any())
+        {
+            <text>
+                        // No items and no warehouse selected - show initial messages
+                        $initialAvailableProductsMessage.removeClass('d-none').show();
+                        $noSelectedItemsMessage.removeClass('d-none').show();
+            </text>
         }
-    </script>
-
-    <partial name="_ValidationScriptsPartial" />
-}
+        else
+        {
+            <text>
+                        // We have items but no warehouse selected (shouldn't happen, but handle gracefully)
+                        $initialAvailableProductsMessage.removeClass('d-none').show();
+            </text>
+        }
+            }
+        }, 100); 
+    });
+</script>
