@@ -7,9 +7,11 @@ namespace Inventory_Management_System.ViewModels
     public class ProductMovementReportViewModel
     {
         [Display(Name = "من تاريخ")]
+        [DataType(DataType.Date)]
         public DateTime? FromDate { get; set; }
 
         [Display(Name = "إلى تاريخ")]
+        [DataType(DataType.Date)]
         public DateTime? ToDate { get; set; }
 
         [Display(Name = "المنتج")]
@@ -18,7 +20,12 @@ namespace Inventory_Management_System.ViewModels
         [Display(Name = "المخزن")]
         public int? WarehouseId { get; set; }
 
-        public List<ProductMovementItem> Movements { get; set; } = new List<ProductMovementItem>();
+        public List<ProductMovementItem> Movements { get; set; }
+
+        public ProductMovementReportViewModel()
+        {
+            Movements = new List<ProductMovementItem>();
+        }
     }
 
     public class ProductMovementItem
