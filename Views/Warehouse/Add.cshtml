@@ -1,33 +1,75 @@
 ﻿@model Inventory_Management_System.Models.Warehouse
 
-<h2 style="margin-bottom: 20px;">Add Warehouse</h2>
+@{
+    ViewData["Title"] = "Add New Warehouse";
+}
 
-<form asp-action="SaveAdd" method="post" style="max-width: 500px; padding: 20px; border: 1px solid #ccc; border-radius: 10px;">
-    @Html.AntiForgeryToken() @* ADDED: Anti-forgery token for security *@
-    <div style="margin-bottom: 20px;">
-        <label asp-for="Name" style="display: block; font-weight: bold; margin-bottom: 5px;"></label>
-        <input asp-for="Name" class="form-control" style="width: 100%; padding: 10px;" />
-        <span asp-validation-for="Name" style="color:red; font-size: 14px;"></span>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-header bg-primary text-white text-center py-3 rounded-top-3">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-plus-circle me-2"></i>Add New Warehouse
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="SaveAdd" method="post" class="needs-validation" novalidate>
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label fw-bold">Warehouse Name</label>
+                            <input asp-for="Name" class="form-control form-control-lg" placeholder="e.g., Main Warehouse, Returns Dept." required />
+                            <div class="invalid-feedback">Please enter a valid warehouse name.</div>
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Address" class="form-label fw-bold">Address</label>
+                            <input asp-for="Address" class="form-control" placeholder="e.g., 123 Main St, City, Country" />
+                            <span asp-validation-for="Address" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="ManagerId" class="form-label fw-bold">Assigned Manager</label>
+                            <select asp-for="ManagerId" class="form-select" asp-items="@(ViewBag.Managers as SelectList)">
+                                <option value="">-- Select a Manager (Optional) --</option>
+                            </select>
+                            <span asp-validation-for="ManagerId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-save me-2"></i>Create Warehouse
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-arrow-left me-2"></i>Back to List
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div style="margin-bottom: 20px;">
-        <label asp-for="Address" style="display: block; font-weight: bold; margin-bottom: 5px;"></label>
-        <input asp-for="Address" class="form-control" style="width: 100%; padding: 10px;" />
-    </div>
-
-    @* ADDED: Manager dropdown *@
-    <div style="margin-bottom: 20px;">
-        <label asp-for="ManagerId" style="display: block; font-weight: bold; margin-bottom: 5px;">Manager</label>
-        <select asp-for="ManagerId" class="form-control" style="width: 100%; padding: 10px;" asp-items="@(ViewBag.Managers as SelectList)">
-            <option value="">-- Select Manager --</option>
-        </select>
-        <span asp-validation-for="ManagerId" style="color:red; font-size: 14px;"></span>
-    </div>
-
-    <button type="submit" class="btn btn-success">Add Warehouse</button>
-    <a href="@Url.Action("Index", "Warehouse")" class="btn btn-success ms-2">Back</a>
-</form>
+</div>
 
 @section Scripts {
     @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script>
+        // Example of simple client-side validation using Bootstrap's needs-validation
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+    </script>
 }

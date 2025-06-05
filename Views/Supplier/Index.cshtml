@@ -1,45 +1,148 @@
-﻿@model IEnumerable<Inventory_Management_System.Models.Supplier>
-
+﻿@model List<Inventory_Management_System.Models.Supplier>
 @{
-    ViewData["Title"] = "Suppliers List";
+    ViewData["Title"] = "All Suppliers";
 }
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h2 class="card-title mb-0">
+                        <i class="fas fa-truck me-2"></i>All Suppliers
+                    </h2>
+                    <a class="btn btn-light btn-sm" asp-action="Add" asp-controller="Supplier">
+                        <i class="fas fa-plus me-1"></i> Add New Supplier
+                    </a>
+                </div>
+                <div class="card-body">
+                    <!-- Success/Error Messages -->
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
 
-<h2>Suppliers</h2>
+                    @if (!Model.Any())
+                    {
+                        <div class="alert alert-info text-center" role="alert">
+                            <i class="fas fa-info-circle me-2"></i>
+                            No suppliers found. Click "Add New Supplier" to get started!
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Phone</th>
+                                        <th>Mobile</th>
+                                        <th>Email</th>
+                                        <th>Website</th>
+                                        <th>Created At</th>
+                                        <th>Updated At</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var supplier in Model)
+                                    {
+                                        <tr>
+                                            <td>@supplier.Id</td>
+                                            <td>
+                                                <strong>@supplier.Name</strong>
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(supplier.Phone))
+                                                {
+                                                    <span>
+                                                        <i class="fas fa-phone me-1"></i>@supplier.Phone
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(supplier.Mobile))
+                                                {
+                                                    <span>
+                                                        <i class="fas fa-mobile-alt me-1"></i>@supplier.Mobile
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(supplier.Email))
+                                                {
+                                                    <a href="mailto:@supplier.Email" class="text-decoration-none">
+                                                        <i class="fas fa-envelope me-1"></i>@supplier.Email
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(supplier.Website))
+                                                {
+                                                    <a href="@supplier.Website" target="_blank" class="text-decoration-none" rel="noopener noreferrer">
+                                                        <i class="fas fa-globe me-1"></i>Visit Website
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">-</span>
+                                                }
+                                            </td>
+                                            <td>@supplier.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                                            <td>@(supplier.UpdatedAt.HasValue ? supplier.UpdatedAt.Value.ToString("yyyy-MM-dd HH:mm") : "-")</td>
+                                            <td class="text-center">
+                                                <a asp-action="Edit" asp-controller="Supplier" asp-route-id="@supplier.Id"
+                                                   class="btn btn-sm btn-outline-primary" title="Edit Supplier">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
 
+                        <!-- Summary Info -->
+                    }
+                </div>
+                <div class="card-footer text-end">
+                    <a class="btn btn-secondary" asp-action="Index" asp-controller="Home">
+                        <i class="fas fa-arrow-left me-1"></i> Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Phone</th>
-            <th>Mobile</th>
-            <th>Email</th>
-            <th>Website</th>
-            <th>Created At</th>
-            <th>Updated At</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var supplier in Model)
-        {
-            <tr>
-                <td>@supplier.Name</td>
-                <td>@supplier.Phone</td>
-                <td>@supplier.Mobile</td>
-                <td>@supplier.Email</td>
-                <td>@supplier.Website</td>
-                <td>@supplier.CreatedAt.ToString("yyyy-MM-dd")</td>
-                <td>@(supplier.UpdatedAt.HasValue ? supplier.UpdatedAt.Value.ToString("yyyy-MM-dd") : "-")</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@supplier.Id" class="btn btn-primary btn-sm">Edit</a>
-                </td>
-            </tr>
-        }
-      
-    </tbody>
-
-</table>
-<a class="btn btn-success" href="@Url.Action("Add", "Supplier")">Add New Supplier</a>
-<a class="btn btn-success ms-2" href="@Url.Action("Index", "Home")">Back</a>
+@section Scripts {
+    <script>
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(function() {
+            $('.alert').fadeOut('slow');
+        }, 5000);
+    </script>
+}

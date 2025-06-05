@@ -1,56 +1,175 @@
 ﻿@model Inventory_Management_System.Models.Supplier
-
 @{
     ViewData["Title"] = "Edit Supplier";
 }
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-header bg-primary text-white text-center py-3 rounded-top-3">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-edit me-2"></i>Edit Supplier
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="SaveEdit" method="post" class="needs-validation" novalidate>
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="CreatedAt" />
 
-<h2>Edit Supplier</h2>
+                        <!-- Supplier Name -->
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label fw-bold required">Supplier Name</label>
+                            <input asp-for="Name" class="form-control form-control-lg"
+                                   pattern="[a-zA-Z0-9\s\-\.\,&]{2,100}"
+                                   title="Name must be 2-100 characters and contain only letters, numbers, spaces, hyphens, periods, commas, and ampersands"
+                                   required />
+                            <div class="invalid-feedback">Please enter a valid supplier name (2-100 characters).</div>
+                            <span asp-validation-for="Name" class="text-danger small"></span>
+                        </div>
 
-<form asp-action="SaveEdit" method="post">
-    <input type="hidden" asp-for="Id" />
+                        <!-- Phone Number -->
+                        <div class="mb-3">
+                            <label asp-for="Phone" class="form-label fw-bold">Phone Number</label>
+                            <input asp-for="Phone" type="tel" class="form-control"
+                                   pattern="[\+]?[0-9\-\(\)\s]{10,15}"
+                                   title="Please enter a valid phone number (10-15 digits, may include +, -, (), spaces)" />
+                            <div class="invalid-feedback">Please enter a valid phone number.</div>
+                            <span asp-validation-for="Phone" class="text-danger small"></span>
+                        </div>
 
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <!-- Mobile Number -->
+                        <div class="mb-3">
+                            <label asp-for="Mobile" class="form-label fw-bold">Mobile Number</label>
+                            <input asp-for="Mobile" type="tel" class="form-control"
+                                   pattern="[\+]?[0-9\-\(\)\s]{10,15}"
+                                   title="Please enter a valid mobile number (10-15 digits, may include +, -, (), spaces)" />
+                            <div class="invalid-feedback">Please enter a valid mobile number.</div>
+                            <span asp-validation-for="Mobile" class="text-danger small"></span>
+                        </div>
 
-    <div class="form-group">
-        <label asp-for="Name"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
+                        <!-- Email Address -->
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label fw-bold">Email Address</label>
+                            <input asp-for="Email" type="email" class="form-control"
+                                   title="Please enter a valid email address" />
+                            <div class="invalid-feedback">Please enter a valid email address.</div>
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Website URL -->
+                        <div class="mb-3">
+                            <label asp-for="Website" class="form-label fw-bold">Website URL</label>
+                            <input asp-for="Website" type="url" class="form-control"
+                                   title="Please enter a valid URL starting with http:// or https://" />
+                            <div class="invalid-feedback">Please enter a valid website URL (must start with http:// or https://).</div>
+                            <span asp-validation-for="Website" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Contact Method Requirement Notice -->
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Note:</strong> At least one contact method (Phone, Mobile, or Email) is required.
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save me-2"></i>Save Changes
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div class="form-group">
-        <label asp-for="Phone"></label>
-        <input asp-for="Phone" class="form-control" />
-        <span asp-validation-for="Phone" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Fax"></label>
-        <input asp-for="Fax" class="form-control" />
-        <span asp-validation-for="Fax" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Mobile"></label>
-        <input asp-for="Mobile" class="form-control" />
-        <span asp-validation-for="Mobile" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Email"></label>
-        <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Website"></label>
-        <input asp-for="Website" class="form-control" />
-        <span asp-validation-for="Website" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Update</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-</form>
+</div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script>
+        // Enhanced client-side validation
+        (function () {
+            'use strict'
+
+            // Bootstrap validation
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        // Custom validation for contact methods
+                        var phone = document.querySelector('input[name="Phone"]').value.trim();
+                        var mobile = document.querySelector('input[name="Mobile"]').value.trim();
+                        var email = document.querySelector('input[name="Email"]').value.trim();
+
+                        var hasContact = phone || mobile || email;
+
+                        if (!hasContact) {
+                            event.preventDefault();
+                            event.stopPropagation();
+
+                            // Show custom error message
+                            var alertDiv = document.createElement('div');
+                            alertDiv.className = 'alert alert-danger alert-dismissible fade show mt-3';
+                            alertDiv.innerHTML = `
+                                <strong>Error:</strong> At least one contact method (Phone, Mobile, or Email) is required.
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            `;
+
+                            // Remove existing error if present
+                            var existingError = document.querySelector('.alert-danger');
+                            if (existingError) {
+                                existingError.remove();
+                            }
+
+                            // Insert error message
+                            form.insertBefore(alertDiv, form.querySelector('.d-flex'));
+
+                            return false;
+                        }
+
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+
+            // Real-time validation feedback
+            function addRealTimeValidation() {
+                var inputs = document.querySelectorAll('input[pattern], input[type="email"], input[type="url"], input[type="tel"]');
+
+                inputs.forEach(function(input) {
+                    input.addEventListener('blur', function() {
+                        validateSingleField(this);
+                    });
+
+                    input.addEventListener('input', function() {
+                        if (this.classList.contains('is-invalid')) {
+                            validateSingleField(this);
+                        }
+                    });
+                });
+            }
+
+            function validateSingleField(field) {
+                var isValid = field.checkValidity();
+
+                if (isValid) {
+                    field.classList.remove('is-invalid');
+                    field.classList.add('is-valid');
+                } else {
+                    field.classList.remove('is-valid');
+                    field.classList.add('is-invalid');
+                }
+            }
+
+            // Initialize real-time validation
+            addRealTimeValidation();
+
+        })()
+    </script>
 }

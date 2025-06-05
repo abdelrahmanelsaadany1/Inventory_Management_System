@@ -5,11 +5,19 @@ namespace Inventory_Management_System.Models
 {
     public class Product
     {
+        [Key]
         public int Id { get; set; }
+
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+        [Required(ErrorMessage = "Product Code is required.")]
+        [StringLength(50, ErrorMessage = "Product Code cannot exceed 50 characters.")]
+        [Display(Name = "Product Code")]
+        public string Code { get; set; }  // Unique
 
-        public string Code { get; set; } // Unique
+        [Required(ErrorMessage = "Product Name is required.")]
+        [StringLength(100, ErrorMessage = "Product Name cannot exceed 100 characters.")]
+        [Display(Name = "Product Name")]
         public string Name { get; set; }
         [JsonIgnore]
         public ICollection<ProductUnits> ProductUnits { get; set; } = new HashSet<ProductUnits>();

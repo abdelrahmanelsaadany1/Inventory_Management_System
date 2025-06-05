@@ -3,21 +3,54 @@
     ViewData["Title"] = "Customers List";
 }
 
-<h2 class="mb-3">Customers</h2>
+<style>
+    .customers-table {
+        width: 100%;
+        font-size: 14px;
+     
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
 
+        .customers-table th {
+            padding: 12px 8px;
+            border: none;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .customers-table td {
+            padding: 12px 8px;
+            border: none;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+            word-wrap: break-word;
+            max-width: 150px;
+        }
+
+       
+
+        .customers-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+</style>
+
+<h2 class="mb-3">Customers</h2>
 <div class="table-responsive">
-    <table class="table table-bordered table-striped mb-3">
+    <table class="table table-bordered table-striped mb-3 customers-table">
         <thead>
             <tr>
-                <th style="min-width: 120px;">Name</th>
-                <th style="min-width: 100px;">Phone</th>
-                <th style="min-width: 80px;">Fax</th>
-                <th style="min-width: 100px;">Mobile</th>
-                <th style="min-width: 150px;">Email</th>
-                <th style="min-width: 120px;">Website</th>
-                <th style="min-width: 100px;">Created At</th>
-                <th style="min-width: 100px;">Updated At</th>
-                <th style="min-width: 80px;">Actions</th>
+                <th>Name</th>
+                <th>Phone</th>
+           
+                <th>Mobile</th>
+                <th>Email</th>
+                <th>Website</th>
+                <th>Created At</th>
+                <th>Updated At</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -26,7 +59,7 @@
                 <tr>
                     <td>@customer.Name</td>
                     <td>@customer.Phone</td>
-                    <td>@customer.Fax</td>
+                    
                     <td>@customer.Mobile</td>
                     <td>@customer.Email</td>
                     <td>@customer.Website</td>
@@ -40,7 +73,6 @@
         </tbody>
     </table>
 </div>
-
 <div class="mt-3">
     <a class="btn btn-success" href="@Url.Action("Add", "Customer")">Add New Customer</a>
     <a class="btn btn-success ms-2" href="@Url.Action("Index", "Home")">Back</a>

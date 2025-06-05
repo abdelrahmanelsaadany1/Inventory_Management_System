@@ -13,7 +13,7 @@
         <div class="col-md-4">
             <div class="form-group">
                 <label asp-for="SelectedWarehouseId"></label>
-                <select asp-for="SelectedWarehouseId" asp-items="Model.AllWarehouses" class="form-control">
+                <select asp-for="SelectedWarehouseId" asp-items="Model.AllWarehouses" class="form-control" style="background-color: #7c79d4;" style="background-color: #7b7bd5;">
                     <option value="">-- Select a Warehouse --</option>
                 </select>
                 <span asp-validation-for="SelectedWarehouseId" class="text-danger"></span>
@@ -105,5 +105,5 @@ else if (Model.SelectedWarehouseId != 0)
 }
 
 <div>
-    <a asp-controller="Home" asp-action="Index">Back to Home</a>
+    <a asp-action="Index" asp-controller="Home" class="btn btn-secondary ms-2">Back to Home</a>
 </div>

@@ -2,41 +2,49 @@
 
 <h2>Add Customer</h2>
 
-<form asp-action="SaveAdd" method="post">
-    <div class="form-group">
-        <label asp-for="Name"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
+<form asp-action="SaveAdd" method="post" class="needs-validation" novalidate>
+    <div class="form-group mb-3">
+        <label asp-for="Name" class="form-label fw-bold required">Customer Name</label>
+        <input asp-for="Name" class="form-control form-control-lg" placeholder="Enter Customer Name"
+               pattern="[a-zA-Z0-9\s\-\.\,&]{2,100}"
+               title="Name must be 2-100 characters and contain only letters, numbers, spaces, hyphens, periods, commas, and ampersands"
+               required />
+        <div class="invalid-feedback">Please enter a valid supplier name (2-100 characters).</div>
+        <span asp-validation-for="Name" class="text-danger small"></span>
     </div>
 
-    <div class="form-group">
-        <label asp-for="Phone"></label>
-        <input asp-for="Phone" class="form-control" />
-        <span asp-validation-for="Phone" class="text-danger"></span>
+    <div class="form-group mb-3">
+        <label asp-for="Phone" class="form-label fw-bold">Phone Number</label>
+        <input asp-for="Phone" type="tel" class="form-control" placeholder="e.g., +1-234-567-8900"
+               pattern="[\+]?[0-9\-\(\)\s]{10,15}"
+               title="Please enter a valid phone number (10-15 digits, may include +, -, (), spaces)" />
+        <div class="invalid-feedback">Please enter a valid phone number.</div>
+        <span asp-validation-for="Phone" class="text-danger small"></span>
     </div>
 
-    <div class="form-group">
-        <label asp-for="Fax"></label>
-        <input asp-for="Fax" class="form-control" />
-        <span asp-validation-for="Fax" class="text-danger"></span>
+    <div class="form-group mb-3">
+        <label asp-for="Mobile" class="form-label fw-bold">Mobile Number</label>
+        <input asp-for="Mobile" type="tel" class="form-control" placeholder="e.g., +1-234-567-8900"
+               pattern="[\+]?[0-9\-\(\)\s]{10,15}"
+               title="Please enter a valid mobile number (10-15 digits, may include +, -, (), spaces)" />
+        <div class="invalid-feedback">Please enter a valid mobile number.</div>
+        <span asp-validation-for="Mobile" class="text-danger small"></span>
     </div>
 
-    <div class="form-group">
-        <label asp-for="Mobile"></label>
-        <input asp-for="Mobile" class="form-control" />
-        <span asp-validation-for="Mobile" class="text-danger"></span>
+    <div class="form-group mb-3">
+        <label asp-for="Email" class="form-label fw-bold">Email Address</label>
+        <input asp-for="Email" type="email" class="form-control" placeholder="e.g., supplier@example.com"
+               title="Please enter a valid email address" />
+        <div class="invalid-feedback">Please enter a valid email address.</div>
+        <span asp-validation-for="Email" class="text-danger small"></span>
     </div>
 
-    <div class="form-group">
-        <label asp-for="Email"></label>
-        <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Website"></label>
-        <input asp-for="Website" class="form-control" />
-        <span asp-validation-for="Website" class="text-danger"></span>
+    <div class="form-group mb-3">
+        <label asp-for="Website" class="form-label fw-bold">Website URL</label>
+        <input asp-for="Website" type="url" class="form-control" placeholder="e.g., https://www.example.com"
+               title="Please enter a valid URL starting with http:// or https://" />
+        <div class="invalid-feedback">Please enter a valid website URL (must start with http:// or https://).</div>
+        <span asp-validation-for="Website" class="text-danger small"></span>
     </div>
 
     <button type="submit" class="btn btn-success">Save</button>
@@ -47,4 +55,19 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        // Example of custom client-side validation
+        document.addEventListener('DOMContentLoaded', function() {
+            var forms = document.querySelectorAll('.needs-validation');
+            Array.prototype.slice.call(forms).forEach(function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        });
+    </script>
 }

@@ -13,6 +13,7 @@
 <table class="table table-bordered table-striped">
     <thead>
         <tr>
+            <th>ID</th> @* Added Manager ID header *@
             <th>Name</th>
             <th>Contact Info</th>
             <th>Created At</th>
@@ -24,6 +25,7 @@
         @foreach (var manager in Model)
         {
             <tr>
+                <td>@manager.Id</td> @* Added Manager ID data *@
                 <td>@manager.Name</td>
                 <td>@(string.IsNullOrEmpty(manager.ContactInfo) ? "-" : manager.ContactInfo)</td>
                 <td>@manager.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
@@ -34,5 +36,12 @@
                 </td>
             </tr>
         }
+        
     </tbody>
+   
 </table>
+<div class="form-group mt-3">
+
+    <a asp-action="Index" asp-controller="Home" class="btn btn-secondary ms-2">Back to Home</a>
+</div>
+</div>

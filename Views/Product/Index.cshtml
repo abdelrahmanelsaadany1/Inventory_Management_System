@@ -1,36 +1,75 @@
 ﻿@model List<Inventory_Management_System.Models.Product>
+
 @{
     ViewData["Title"] = "All Products";
 }
 
-<h2 class="mb-3">All Products</h2>
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h2 class="card-title mb-0">
+                        <i class="fas fa-cubes me-2"></i>All Products
+                    </h2>
+                    <a class="btn btn-light btn-sm" asp-action="Add" asp-controller="Product">
+                        <i class="fas fa-plus me-1"></i> Add New Product
+                    </a>
+                </div>
+                <div class="card-body">
+                    @if (!Model.Any())
+                    {
+                        <div class="alert alert-info text-center" role="alert">
+                            No products found. Click "Add New Product" to get started!
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Code</th>
+                                        <th>Name</th>
+                                        <th>Expiry Period (Days)</th> @* ADDED: Expiry Period column *@
+                                        <th>Created At</th>
+                                        <th>Updated At</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>@item.Id</td>
+                                            <td>@item.Code</td>
+                                            <td>@item.Name</td>
+                                            <td>@item.ExpiryPeriodInDays</td> @* Display Expiry Period *@
+                                            <td>@item.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                                            <td>@(item.UpdatedAt.HasValue ? item.UpdatedAt.Value.ToString("yyyy-MM-dd HH:mm") : "-")</td>
+                                            <td class="text-center">
+                                                <a asp-action="Edit" asp-controller="Product" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary" title="Edit Product">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+                <div class="card-footer text-end">
+                    <a class="btn btn-secondary" asp-action="Index" asp-controller="Home">
+                        <i class="fas fa-arrow-left me-1"></i> Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>Code</th>
-            <th>Name</th>
-            <th>Created At</th>
-            <th>Updated At</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.Code</td>
-                <td>@item.Name</td>
-                <td>@item.CreatedAt.ToShortDateString()</td>
-                <td>@(item.UpdatedAt?.ToShortDateString() ?? "-")</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary btn-sm">Edit</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-<a class="btn btn-success" href="@Url.Action("Add", "Product")">Add New Product</a>
-<a class="btn btn-success ms-2" href="@Url.Action("Index", "Home")">Back</a>
+@section Scripts {
+@* No specific scripts needed for this page *@
+}

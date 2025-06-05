@@ -11,15 +11,22 @@
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div class="form-group mb-3">
-        <label asp-for="Name" class="control-label"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
+        <label asp-for="Name" class="control-label fw-bold required">Manager Name</label>
+        <input asp-for="Name" class="form-control form-control-lg" placeholder="Enter manager name"
+               pattern="[a-zA-Z0-9\s\-\.\,&]{2,100}"
+               title="Name must be 2-100 characters and contain only letters, numbers, spaces, hyphens, periods, commas, and ampersands"
+               required />
+        <div class="invalid-feedback">Please enter a valid manager name (2-100 characters).</div>
+        <span asp-validation-for="Name" class="text-danger small"></span>
     </div>
 
     <div class="form-group mb-3">
-        <label asp-for="ContactInfo" class="control-label"></label>
-        <input asp-for="ContactInfo" class="form-control" />
-        <span asp-validation-for="ContactInfo" class="text-danger"></span>
+        <label asp-for="ContactInfo" class="form-label fw-bold">Contact Info</label>
+        <input asp-for="ContactInfo" type="tel" class="form-control" placeholder="e.g., 01012345678"
+               pattern="^(010|011|012)\d{8}$"
+               title="Please enter a valid 11-digit Egyptian phone number starting with 010, 011, or 012." />
+        <div class="invalid-feedback">Please enter a valid 11-digit Egyptian phone number.</div>
+        <span asp-validation-for="ContactInfo" class="text-danger small"></span>
     </div>
 
     <div class="form-group mt-3">

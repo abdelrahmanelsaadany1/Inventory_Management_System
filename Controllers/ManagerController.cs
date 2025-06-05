@@ -1,9 +1,8 @@
-﻿// Inventory_Management_System.Controllers/ManagerController.cs
-
-using Inventory_Management_System.Models;
+﻿using Inventory_Management_System.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System; // Make sure this is present for DateTime
 
 namespace Inventory_Management_System.Controllers
 {
@@ -27,11 +26,7 @@ namespace Inventory_Management_System.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult SaveAdd(Manager manager)
         {
-            if (string.IsNullOrWhiteSpace(manager.Name))
-            {
-                ModelState.AddModelError("Name", "Manager Name is required.");
-            }
-
+            // ModelState.IsValid will now check Data Annotations on the Manager model
             if (ModelState.IsValid)
             {
                 manager.CreatedAt = DateTime.UtcNow;
@@ -41,6 +36,7 @@ namespace Inventory_Management_System.Controllers
                 return RedirectToAction("Index");
             }
 
+            // If ModelState is not valid, return the view with validation errors
             return View("Add", manager);
         }
 
@@ -59,11 +55,7 @@ namespace Inventory_Management_System.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult SaveEdit(Manager manager)
         {
-            if (string.IsNullOrWhiteSpace(manager.Name))
-            {
-                ModelState.AddModelError("Name", "Manager Name is required.");
-            }
-
+            // ModelState.IsValid will now check Data Annotations on the Manager model
             if (ModelState.IsValid)
             {
                 var existingManager = _context.Managers.Find(manager.Id);
@@ -81,6 +73,7 @@ namespace Inventory_Management_System.Controllers
                 return RedirectToAction("Index");
             }
 
+            // If ModelState is not valid, return the view with validation errors
             return View("Edit", manager);
         }
 

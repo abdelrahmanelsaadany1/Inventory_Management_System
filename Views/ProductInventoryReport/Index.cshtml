@@ -11,7 +11,7 @@
         <div class="col-md-4">
             <div class="form-group">
                 <label asp-for="SelectedProductId">Select Product (Optional)</label>
-                <select asp-for="SelectedProductId" asp-items="Model.AllProducts" class="form-control">
+                <select asp-for="SelectedProductId" asp-items="Model.AllProducts" class="form-control" style="background-color: #7c79d4;">
                     <option value="">-- All Products --</option>
                 </select>
                 <small class="form-text text-muted">Leave blank to include all products.</small>
@@ -45,7 +45,11 @@
     </div>
     <div class="form-group mt-3">
         <button type="submit" class="btn btn-primary">Generate Report</button>
+      
+            <a asp-action="Index" asp-controller="Home" class="btn btn-secondary ms-2">Back to Home</a>
+        
     </div>
+
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 </form>
 
@@ -89,7 +93,9 @@
                 </tr>
             }
         </tbody>
+       
     </table>
+    
 }
 else if (Model.ReportData != null)
 {

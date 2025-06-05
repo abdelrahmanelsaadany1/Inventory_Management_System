@@ -55,7 +55,7 @@ namespace Inventory_Management_System.Controllers
 
                 existing.Name = customer.Name;
                 existing.Phone = customer.Phone;
-                existing.Fax = customer.Fax;
+              
                 existing.Mobile = customer.Mobile;
                 existing.Email = customer.Email;
                 existing.Website = customer.Website;
