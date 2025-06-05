@@ -17,8 +17,17 @@
 <form asp-action="Create" method="post">
     <div class="form-group">
         <label asp-for="OrderNumber"></label>
-        <input asp-for="OrderNumber" class="form-control" />
+        <div class="input-group">
+            <input asp-for="OrderNumber" class="form-control" id="orderNumberInput" />
+            <div class="input-group-append">
+                <button type="button" class="btn btn-outline-secondary" id="generateOrderNumber" title="Generate New Order Number">
+                    <i class="fas fa-refresh"></i> Generate
+                </button>
+            </div>
+        </div>
         <span asp-validation-for="OrderNumber" class="text-danger"></span>
+        <div id="orderNumberStatus" class="mt-1"></div>
+        <small class="form-text text-muted">Order number will be auto-generated if left empty</small>
     </div>
 
     <div class="form-group">
@@ -84,55 +93,172 @@
         </tbody>
     </table>
 
-    <button type="button" class="btn btn-secondary" onclick="addRow()">Add Item</button>
     <br /><br />
 
+    <div>
+        <button type="button" class="btn btn-secondary" onclick="addRow()">Add Item</button>
+        <a asp-action="Index" asp-controller="SupplyOrder" class="btn btn-secondary ms-2">Back to Home</a>
+    </div>
+
+    <br />
     <button type="submit" class="btn btn-primary">Save</button>
 </form>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 
-    <script>
-        let productList = @Html.Raw(Json.Serialize(Model.Products));
-
-        function addRow() {
-            let index = document.querySelectorAll("#items-table tbody tr").length;
-            let row = `
-<tr>
-    <td>
-        <select name="Items[${index}].ProductId" class="form-control">
-            <option value="">-- Select --</option>
-            ${productList.map(p => `<option value="${p.Id}">${p.Name}</option>`).join('')}
-        </select>
-    </td>
-    <td><input name="Items[${index}].Quantity" class="form-control" /></td>
-    <td><input name="Items[${index}].ProductionDate" class="form-control" type="date" /></td>
-    <td><input name="Items[${index}].ExpiryPeriodInDays" class="form-control" /></td>
-    <td><button type="button" class="btn btn-danger" onclick="removeRow(this)">Remove</button></td>
-</tr>`;
-            document.querySelector("#items-table tbody").insertAdjacentHTML("beforeend", row);
+    <style>
+        /* Style for product dropdown lists */
+        select[name*="ProductId"] {
+            background-color: #7c79d4 !important;
         }
 
-        function removeRow(button) {
-            let tbody = button.closest("tbody");
-            button.closest("tr").remove();
-            
-            // Re-index remaining rows
-            let rows = tbody.querySelectorAll("tr");
-            rows.forEach((row, index) => {
-                row.querySelectorAll("select, input").forEach(element => {
-                    if (element.name) {
-                        element.name = element.name.replace(/\[\d+\]/, `[${index}]`);
+        .order-number-valid {
+            color: #28a745;
+            font-size: 0.875em;
+        }
+
+        .order-number-invalid {
+            color: #dc3545;
+            font-size: 0.875em;
+        }
+
+        .order-number-suggestion {
+            color: #007bff;
+            font-size: 0.875em;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+    </style>
+
+    <script>
+                let productList = @Html.Raw(Json.Serialize(Model.Products));
+                let checkTimeout;
+
+                // Check order number availability
+                function checkOrderNumber(orderNumber) {
+                    if (!orderNumber || orderNumber.trim() === '') {
+                        document.getElementById('orderNumberStatus').innerHTML = '';
+                        return;
+                    }
+
+                    clearTimeout(checkTimeout);
+                    checkTimeout = setTimeout(() => {
+                        fetch('@Url.Action("CheckOrderNumber")', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                            },
+                            body: JSON.stringify({ orderNumber: orderNumber })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            const statusDiv = document.getElementById('orderNumberStatus');
+                            if (data.exists) {
+                                statusDiv.innerHTML = `
+                                    <div class="order-number-invalid">
+                                        <i class="fas fa-times-circle"></i> ${data.message}
+                                        <br>
+                                        <span class="order-number-suggestion" onclick="useSuggestion('${data.suggestion}')">
+                                            Click here to use: ${data.suggestion}
+                                        </span>
+                                    </div>
+                                `;
+                            } else {
+                                statusDiv.innerHTML = `
+                                    <div class="order-number-valid">
+                                        <i class="fas fa-check-circle"></i> ${data.message}
+                                    </div>
+                                `;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error checking order number:', error);
+                        });
+                    }, 500);
+                }
+
+                // Use suggested order number
+                function useSuggestion(suggestion) {
+                    document.getElementById('orderNumberInput').value = suggestion;
+                    checkOrderNumber(suggestion);
+                }
+
+                // Generate new order number
+                function generateOrderNumber() {
+                    fetch('@Url.Action("CheckOrderNumber")', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        },
+                        body: JSON.stringify({ orderNumber: 'generate-new' })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.suggestion) {
+                            document.getElementById('orderNumberInput').value = data.suggestion;
+                            checkOrderNumber(data.suggestion);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error generating order number:', error);
+                    });
+                }
+
+                // Event listeners
+                document.getElementById('orderNumberInput').addEventListener('input', function() {
+                    checkOrderNumber(this.value);
+                });
+
+                document.getElementById('generateOrderNumber').addEventListener('click', generateOrderNumber);
+
+                // Check initial order number if present
+                document.addEventListener('DOMContentLoaded', function() {
+                    const initialOrderNumber = document.getElementById('orderNumberInput').value;
+                    if (initialOrderNumber) {
+                        checkOrderNumber(initialOrderNumber);
                     }
                 });
-            });
-        }
 
-        // Debug form submission
-        document.querySelector('form').addEventListener('submit', function(e) {
-            console.log('Form submitting...');
-            console.log('Form data:', new FormData(this));
-        });
+                function addRow() {
+                    let index = document.querySelectorAll("#items-table tbody tr").length;
+                    let row = `
+        <tr>
+            <td>
+                <select name="Items[${index}].ProductId" class="form-control">
+                    <option value="">-- Select --</option>
+                    ${productList.map(p => `<option value="${p.Id}">${p.Name}</option>`).join('')}
+                </select>
+            </td>
+            <td><input name="Items[${index}].Quantity" class="form-control" /></td>
+            <td><input name="Items[${index}].ProductionDate" class="form-control" type="date" /></td>
+            <td><input name="Items[${index}].ExpiryPeriodInDays" class="form-control" /></td>
+            <td><button type="button" class="btn btn-danger" onclick="removeRow(this)">Remove</button></td>
+        </tr>`;
+                    document.querySelector("#items-table tbody").insertAdjacentHTML("beforeend", row);
+                }
+
+                function removeRow(button) {
+                    let tbody = button.closest("tbody");
+                    button.closest("tr").remove();
+
+                    // Re-index remaining rows
+                    let rows = tbody.querySelectorAll("tr");
+                    rows.forEach((row, index) => {
+                        row.querySelectorAll("select, input").forEach(element => {
+                            if (element.name) {
+                                element.name = element.name.replace(/\[\d+\]/, `[${index}]`);
+                            }
+                        });
+                    });
+                }
+
+                // Debug form submission
+                document.querySelector('form').addEventListener('submit', function(e) {
+                    console.log('Form submitting...');
+                    console.log('Form data:', new FormData(this));
+                });
     </script>
 }

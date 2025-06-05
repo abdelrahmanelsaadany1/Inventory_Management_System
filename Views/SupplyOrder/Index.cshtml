@@ -27,7 +27,11 @@
 }
 
 <p>
-    <a asp-action="Create" class="btn btn-primary">+ Add New Supply Order</a>
+
+    <div>
+        <a asp-action="Create" class="btn btn-primary"> Add New Supply Order</a>
+        <a asp-action="Index" asp-controller="Home" class="btn btn-secondary ms-2">Back to Home</a>
+    </div>
 </p>
 
 @if (!Model.Any())
@@ -41,6 +45,7 @@ else
     <table class="table table-bordered table-striped">
         <thead>
             <tr>
+                <th>ID</th>
                 <th>Order Number</th>
                 <th>Order Date</th>
                 <th>Warehouse</th>
@@ -50,13 +55,16 @@ else
                 <th>Production Date</th>
                 <th>Expiry Status</th>
                 <th>Created At</th>
-                <th>Actions</th>
+               
             </tr>
         </thead>
         <tbody>
             @foreach (var order in Model)
             {
                 <tr>
+                    <td>
+                        <strong>@order.Id</strong>
+                    </td>
                     <td>
                         <strong>@order.OrderNumber</strong>
                     </td>
@@ -80,7 +88,9 @@ else
                             @earliestProduction.ToShortDateString()
                             @if (order.Items.Count() > 1)
                             {
-                                <br><small class="text-muted">(+ @(order.Items.Count() - 1) more)</small>
+                                <br>
+
+                                <small class="text-muted">(+ @(order.Items.Count() - 1) more)</small>
                             }
                         }
                         else
@@ -100,7 +110,7 @@ else
                             {
                                 var expectedExpiry = item.ProductionDate.AddDays(item.ExpiryPeriodInDays);
                                 var daysUntilExpiry = (expectedExpiry - DateTime.Today).Days;
-                                
+
                                 if (daysUntilExpiry < 0)
                                     expiredCount++;
                                 else if (daysUntilExpiry < 7)
@@ -136,23 +146,11 @@ else
                     <td>
                         @order.CreatedAt.ToString("dd/MM/yyyy HH:mm")
                     </td>
-                    <td>
-                        <div class="btn-group" role="group">
-                            <a asp-action="Details" asp-route-id="@order.Id" class="btn btn-sm btn-info" title="View Details">
-                                View
-                            </a>
-                            <a asp-action="Edit" asp-route-id="@order.Id" class="btn btn-sm btn-warning" title="Edit">
-                                Edit
-                            </a>
-                            <button type="button" class="btn btn-sm btn-danger" title="Delete" 
-                                    onclick="confirmDelete(@order.Id, '@order.OrderNumber')">
-                                Delete
-                            </button>
-                        </div>
-                    </td>
+                  
                 </tr>
             }
         </tbody>
+
     </table>
 }
 
