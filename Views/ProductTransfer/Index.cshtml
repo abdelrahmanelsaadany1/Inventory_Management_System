@@ -8,10 +8,15 @@
     <div class="card">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h4 class="mb-0">Product Transfers</h4>
-            <a asp-action="Create" class="btn btn-success">
-                <i class="fas fa-plus"></i> New Transfer
-            </a>
+           
+            <div>
+                <a asp-action="Create" class="btn btn-success">
+                    <i class="fas fa-plus"></i> New Transfer
+                </a>
+                <a asp-action="Index" asp-controller="Home" class="btn btn-secondary ms-2">Back to Home</a>
+            </div>
         </div>
+       
         <div class="card-body">
             @if (TempData["SuccessMessage"] != null)
             {
@@ -25,6 +30,7 @@
                 <table class="table table-bordered table-hover">
                     <thead class="table-dark">
                         <tr>
+                            <th>ID</th>
                             <th>Transfer Number</th>
                             <th>Transfer Date</th>
                             <th>From Warehouse</th>
@@ -32,7 +38,7 @@
                             <th>Number of Items</th>
                             <th>Total Quantity</th>
                             <th>Creation Date</th>
-                            <th>Details</th>
+                      
                         </tr>
                     </thead>
                     <tbody>
@@ -41,6 +47,7 @@
                             foreach (var transfer in Model)
                             {
                                 <tr>
+                                    <td>@transfer.Id</td>
                                     <td>@transfer.TransferNumber</td>
                                     <td>@transfer.TransferDate.ToShortDateString()</td>
                                     <td>@transfer.SourceWarehouse?.Name</td>
@@ -48,21 +55,14 @@
                                     <td>@transfer.Items?.Count()</td>
                                     <td>@transfer.Items?.Sum(i => i.Quantity)</td>
                                     <td>@transfer.CreatedAt.ToLocalTime().ToString("g")</td>
-                                    <td>
-                                        <button type="button" class="btn btn-info btn-sm view-details"
-                                                data-transfer-id="@transfer.Id"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#detailsModal">
-                                            <i class="fas fa-eye"></i> View
-                                        </button>
-                                    </td>
+                                
                                 </tr>
                             }
                         }
                         else
                         {
                             <tr>
-                                <td colspan="8" class="text-center text-muted">
+                                <td colspan="9" class="text-center text-muted">
                                     <i class="fas fa-inbox fa-2x mb-2"></i>
                                     <p>No transfers recorded</p>
                                 </td>
@@ -198,7 +198,6 @@
         .table td {
             vertical-align: middle;
             text-align: center;
-           
         }
 
         .modal-header .btn-close {

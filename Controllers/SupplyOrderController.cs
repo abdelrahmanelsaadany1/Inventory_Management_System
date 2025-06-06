@@ -187,7 +187,7 @@ namespace Inventory_Management_System.Controllers
                     .Include(o => o.Supplier)
                     .Include(o => o.Items)
                     .ThenInclude(i => i.Product)
-                    .OrderByDescending(o => o.CreatedAt)
+                    .OrderBy(o => o.Id)
                     .ToList();
 
                 return View(orders);

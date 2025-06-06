@@ -4,6 +4,31 @@
     ViewData["Title"] = Model.Id == 0 ? "Create Release Order" : "Edit Release Order";
 }
 
+<style>
+    select.form-control {
+        background-color: #7d76cf !important;
+    }
+
+    /* Custom styles for the buttons - KEEPING THE SHAPE CHANGE */
+    .btn.btn-primary,
+    .btn.btn-secondary {
+        border-radius: 10px; /* Adjust this value for more or less rounding */
+    }
+
+    /* New styles for button placement */
+    .button-group {
+        display: flex; /* Use flexbox for alignment */
+        justify-content: flex-start; /* Align items to the right */
+        gap: 10px; /* Space between buttons */
+        margin-top: 20px; /* Add some space above the buttons */
+    }
+
+    .back-button-container {
+        margin-top: 15px; /* Space between action buttons and back button */
+        text-align: left; /* CHANGED: Align the back button to the LEFT */
+    }
+</style>
+
 <h2>@ViewData["Title"]</h2>
 
 <div asp-validation-summary="All" class="text-danger"></div>
@@ -82,21 +107,26 @@
         </tbody>
     </table>
 
-    <button type="button" class="btn btn-secondary" onclick="addRow()">Add Item</button>
-    <br /><br />
+    <div class="button-group">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-secondary" onclick="addRow()">Add Item</button>
+    </div>
 
-    <button type="submit" class="btn btn-primary">Save</button>
 </form>
+
+<div class="back-button-container">
+    <a asp-action="Index" asp-controller="ReleaseOrder" class="btn btn-secondary">Back</a>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 
     <script>
-                let productList = @Html.Raw(Json.Serialize(Model.Products));
+        let productList = @Html.Raw(Json.Serialize(Model.Products));
 
-                function addRow() {
-                    let index = document.querySelectorAll("#items-table tbody tr").length;
-                    let row = `
+        function addRow() {
+            let index = document.querySelectorAll("#items-table tbody tr").length;
+            let row = `
         <tr>
             <td>
                 <select name="Items[${index}].ProductId" class="form-control">
@@ -107,22 +137,22 @@
             <td><input name="Items[${index}].Quantity" class="form-control" /></td>
             <td><button type="button" class="btn btn-danger" onclick="removeRow(this)">Remove</button></td>
         </tr>`;
-                    document.querySelector("#items-table tbody").insertAdjacentHTML("beforeend", row);
-                }
+            document.querySelector("#items-table tbody").insertAdjacentHTML("beforeend", row);
+        }
 
-                function removeRow(button) {
-                    let tbody = button.closest("tbody");
-                    button.closest("tr").remove();
+        function removeRow(button) {
+            let tbody = button.closest("tbody");
+            button.closest("tr").remove();
 
-                    // Re-index remaining rows
-                    let rows = tbody.querySelectorAll("tr");
-                    rows.forEach((row, index) => {
-                        row.querySelectorAll("select, input").forEach(element => {
-                            if (element.name) {
-                                element.name = element.name.replace(/\[\d+\]/, `[${index}]`);
-                            }
-                        });
-                    });
-                }
+            // Re-index remaining rows
+            let rows = tbody.querySelectorAll("tr");
+            rows.forEach((row, index) => {
+                row.querySelectorAll("select, input").forEach(element => {
+                    if (element.name) {
+                        element.name = element.name.replace(/\[\d+\]/, `[${index}]`);
+                    }
+                });
+            });
+        }
     </script>
 }

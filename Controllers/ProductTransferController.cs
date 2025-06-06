@@ -12,20 +12,20 @@ namespace Inventory_Management_System.Controllers
     public class ProductTransferController : Controller
     {
         private readonly InventoryDbContext _context = new InventoryDbContext();
-       
+
         public async Task<IActionResult> Index()
         {
             var transfers = await _context.ProductTransfers
                 .Include(pt => pt.SourceWarehouse)
                 .Include(pt => pt.DestinationWarehouse)
                 .Include(pt => pt.Items)
-                .OrderByDescending(pt => pt.CreatedAt)
+                .OrderBy(pt => pt.Id)
                 .ToListAsync();
 
             return View(transfers);
         }
 
-        
+
         [HttpGet]
         public async Task<IActionResult> GetDetails(int id)
         {
@@ -63,19 +63,19 @@ namespace Inventory_Management_System.Controllers
             return Json(result);
         }
 
-       
+
         public async Task<IActionResult> Create()
         {
             var warehouses = await _context.Warehouses.OrderBy(w => w.Name).ToListAsync();
             ViewBag.Warehouses = new SelectList(warehouses, "Id", "Name");
-            
+
             return View(new ProductTransferViewModel
             {
                 TransferDate = DateTime.Today
             });
         }
 
-      
+
         [HttpGet]
         public async Task<IActionResult> GetWarehouseProducts(int warehouseId)
         {
@@ -106,14 +106,14 @@ namespace Inventory_Management_System.Controllers
             }
         }
 
-       
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ProductTransferViewModel model)
         {
             if (model.SourceWarehouseId == model.DestinationWarehouseId)
             {
-                ModelState.AddModelError("", "لا يمكن أن يكون المخزن المصدر والمقصد نفس المخزن");
+                ModelState.AddModelError("", "you cant transfer to same warehouse");
             }
 
             if (ModelState.IsValid)
@@ -136,9 +136,9 @@ namespace Inventory_Management_System.Controllers
 
                     foreach (var item in model.Items)
                     {
-       
+
                         var sourceProduct = await _context.WarehouseProducts
-                            .FirstOrDefaultAsync(wp => 
+                            .FirstOrDefaultAsync(wp =>
                                 wp.WarehouseId == model.SourceWarehouseId &&
                                 wp.ProductId == item.ProductId &&
                                 wp.SupplierId == item.SupplierId &&
@@ -146,14 +146,14 @@ namespace Inventory_Management_System.Controllers
 
                         if (sourceProduct == null || sourceProduct.Quantity < item.Quantity)
                         {
-                            throw new Exception($"الكمية غير متوفرة للمنتج {item.ProductName}");
+                            throw new Exception($"not enough quantity for this product {item.ProductName}");
                         }
 
-                 
+
                         sourceProduct.Quantity -= item.Quantity;
                         _context.Update(sourceProduct);
 
-                        
+
                         var destProduct = await _context.WarehouseProducts
                             .FirstOrDefaultAsync(wp =>
                                 wp.WarehouseId == model.DestinationWarehouseId &&
@@ -183,7 +183,7 @@ namespace Inventory_Management_System.Controllers
                             _context.Update(destProduct);
                         }
 
-                       
+
                         var transferItem = new ProductTransferItem
                         {
                             ProductTransferId = transfer.Id,
@@ -200,14 +200,14 @@ namespace Inventory_Management_System.Controllers
 
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
-                    
-                    TempData["SuccessMessage"] = "تم تنفيذ عملية التحويل بنجاح";
+
+                    TempData["SuccessMessage"] = "Added successfully";
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    ModelState.AddModelError("", $"حدث خطأ أثناء التحويل: {ex.Message}");
+                    ModelState.AddModelError("", $"something wrong happened please try again: {ex.Message}");
                 }
             }
 
@@ -216,7 +216,7 @@ namespace Inventory_Management_System.Controllers
             return View(model);
         }
 
-        
+
         public async Task<IActionResult> MovementReport(DateTime? fromDate, DateTime? toDate, int? productId, int? warehouseId)
         {
             ViewBag.Products = new SelectList(await _context.Products.OrderBy(p => p.Name).ToListAsync(), "Id", "Name");
@@ -258,12 +258,12 @@ namespace Inventory_Management_System.Controllers
 
                 if (warehouseId.HasValue)
                 {
-                    query = query.Where(pti => 
-                        pti.ProductTransfer.SourceWarehouseId == warehouseId.Value || 
+                    query = query.Where(pti =>
+                        pti.ProductTransfer.SourceWarehouseId == warehouseId.Value ||
                         pti.ProductTransfer.DestinationWarehouseId == warehouseId.Value);
                 }
 
-                
+
                 var movements = await query
                     .OrderByDescending(pti => pti.ProductTransfer.TransferDate)
                     .Select(pti => new ProductMovementItem

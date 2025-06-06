@@ -10,7 +10,7 @@ namespace Inventory_Management_System.Controllers
 {
     public class ReleaseOrderController : Controller
     {
-        private readonly InventoryDbContext _context = new InventoryDbContext(); 
+        private readonly InventoryDbContext _context = new InventoryDbContext();
 
         public IActionResult Create()
         {
@@ -20,15 +20,16 @@ namespace Inventory_Management_System.Controllers
                 Suppliers = _context.Suppliers.ToList(),
                 Products = _context.Products.ToList(),
                 OrderDate = DateTime.Today,
+                OrderNumber = GenerateUniqueOrderNumber(),
                 Items = new List<ReleaseOrderItemViewModel>
                 {
-                    new ReleaseOrderItemViewModel() 
+                    new ReleaseOrderItemViewModel()
                 }
             };
             return View(viewModel);
         }
 
-       
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(AddReleaseOrderViewModel viewModel)
@@ -58,6 +59,7 @@ namespace Inventory_Management_System.Controllers
                 {
                     var releaseOrder = new ReleaseOrder
                     {
+                        Id = viewModel.Id,
                         OrderNumber = viewModel.OrderNumber,
                         OrderDate = viewModel.OrderDate,
                         WarehouseId = viewModel.WarehouseId,
@@ -73,10 +75,10 @@ namespace Inventory_Management_System.Controllers
 
                     _context.ReleaseOrders.Add(releaseOrder);
 
-                   
+
                     foreach (var item in viewModel.Items)
                     {
-                        
+
                         var warehouseProduct = _context.WarehouseProducts
                             .FirstOrDefault(wp => wp.WarehouseId == viewModel.WarehouseId && wp.ProductId == item.ProductId);
 
@@ -89,7 +91,7 @@ namespace Inventory_Management_System.Controllers
                         }
 
                         warehouseProduct.Quantity -= item.Quantity;
-                       
+
                         if (warehouseProduct.Quantity == 0)
                         {
                             _context.WarehouseProducts.Remove(warehouseProduct);
@@ -127,7 +129,7 @@ namespace Inventory_Management_System.Controllers
                     .Include(o => o.Supplier)
                     .Include(o => o.Items)
                     .ThenInclude(i => i.Product)
-                    .OrderByDescending(o => o.CreatedAt)
+                    .OrderBy(o => o.Id)
                     .ToList();
 
                 return View(orders);
@@ -139,7 +141,7 @@ namespace Inventory_Management_System.Controllers
             }
         }
 
-       
+
         public IActionResult Edit(int? id)
         {
             if (id == null)
@@ -174,7 +176,7 @@ namespace Inventory_Management_System.Controllers
             return View(viewModel);
         }
 
-    
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(AddReleaseOrderViewModel viewModel)
@@ -211,35 +213,35 @@ namespace Inventory_Management_System.Controllers
                         return NotFound();
                     }
 
-                   
+
                     foreach (var oldItem in existingReleaseOrder.Items)
                     {
                         var warehouseProduct = _context.WarehouseProducts
                             .FirstOrDefault(wp => wp.WarehouseId == existingReleaseOrder.WarehouseId && wp.ProductId == oldItem.ProductId);
                         if (warehouseProduct != null)
                         {
-                            warehouseProduct.Quantity += oldItem.Quantity; 
+                            warehouseProduct.Quantity += oldItem.Quantity;
                             _context.WarehouseProducts.Update(warehouseProduct);
                         }
                     }
 
-                   
+
                     existingReleaseOrder.OrderNumber = viewModel.OrderNumber;
                     existingReleaseOrder.OrderDate = viewModel.OrderDate;
                     existingReleaseOrder.WarehouseId = viewModel.WarehouseId;
                     existingReleaseOrder.SupplierId = viewModel.SupplierId;
                     existingReleaseOrder.UpdatedAt = DateTime.Now;
 
-                    
+
                     _context.ReleaseOrderItems.RemoveRange(existingReleaseOrder.Items);
                     existingReleaseOrder.Items = viewModel.Items.Select(item => new ReleaseOrderItem
                     {
                         ProductId = item.ProductId,
                         Quantity = item.Quantity,
-                        CreatedAt = DateTime.Now 
+                        CreatedAt = DateTime.Now
                     }).ToList();
 
-                   
+
                     foreach (var newItem in viewModel.Items)
                     {
                         var warehouseProduct = _context.WarehouseProducts
@@ -288,6 +290,38 @@ namespace Inventory_Management_System.Controllers
             viewModel.Warehouses = _context.Warehouses.ToList();
             viewModel.Suppliers = _context.Suppliers.ToList();
             viewModel.Products = _context.Products.ToList();
+        }
+
+        private string GenerateUniqueOrderNumber()
+        {
+            string prefix = "RO";
+            string datePart = DateTime.Now.ToString("yyyyMMdd");
+
+            // Get the highest order number for today
+            string todayPrefix = $"{prefix}{datePart}";
+            var existingOrders = _context.ReleaseOrders
+                .Where(r => r.OrderNumber.StartsWith(todayPrefix))
+                .Select(r => r.OrderNumber)
+                .ToList();
+
+            int nextSequence = 1;
+            if (existingOrders.Any())
+            {
+                var sequences = existingOrders
+                    .Select(orderNum =>
+                    {
+                        string sequencePart = orderNum.Substring(todayPrefix.Length);
+                        return int.TryParse(sequencePart, out int seq) ? seq : 0;
+                    })
+                    .Where(seq => seq > 0);
+
+                if (sequences.Any())
+                {
+                    nextSequence = sequences.Max() + 1;
+                }
+            }
+
+            return $"{todayPrefix}{nextSequence:D3}";
         }
 
         protected override void Dispose(bool disposing)
