@@ -33,7 +33,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label asp-for="SourceWarehouseId" class="control-label"></label>
-                                    <select asp-for="SourceWarehouseId" class="form-control" asp-items="ViewBag.Warehouses">
+                                    <select asp-for="SourceWarehouseId" class="form-control custom-dropdown" asp-items="ViewBag.Warehouses">
                                         <option value="">-- Select Source Warehouse --</option>
                                     </select>
                                     <span asp-validation-for="SourceWarehouseId" class="text-danger"></span>
@@ -42,7 +42,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label asp-for="DestinationWarehouseId" class="control-label"></label>
-                                    <select asp-for="DestinationWarehouseId" class="form-control" asp-items="ViewBag.Warehouses">
+                                    <select asp-for="DestinationWarehouseId" class="form-control custom-dropdown" asp-items="ViewBag.Warehouses">
                                         <option value="">-- Select Destination Warehouse --</option>
                                     </select>
                                     <span asp-validation-for="DestinationWarehouseId" class="text-danger"></span>
@@ -50,11 +50,11 @@
                             </div>
                         </div>
 
-                        <div class="card mb-3">
-                            <div class="card-header bg-light">
+                        <div class="card mb-3 custom-card">
+                            <div class="card-header custom-card-header">
                                 <h5 class="mb-0">Products Available in Source Warehouse</h5>
                             </div>
-                            <div class="card-body">
+                            <div class="card-body custom-card-body">
                                 <div id="productsTable" style="display: none;">
                                     <div class="table-responsive">
                                         <table class="table table-bordered table-hover">
@@ -89,11 +89,11 @@
                             </div>
                         </div>
 
-                        <div class="card mb-3">
-                            <div class="card-header bg-light">
+                        <div class="card mb-3 custom-card">
+                            <div class="card-header custom-card-header">
                                 <h5 class="mb-0">Products to Transfer</h5>
                             </div>
-                            <div class="card-body">
+                            <div class="card-body custom-card-body">
                                 <div class="table-responsive">
                                     <table class="table table-bordered table-hover" id="selectedProductsTable">
                                         <thead class="thead-dark">
@@ -350,6 +350,42 @@
     </script>
 
     <style>
+        /* Custom dropdown styling */
+        .custom-dropdown {
+            background-color: #999ce3 !important;
+            color: white !important;
+        }
+
+            .custom-dropdown option {
+                background-color: #999ce3 !important;
+                color: white !important;
+            }
+
+        /* Custom card styling for product sections */
+        .custom-card {
+            background-color: #999ce3 !important;
+        }
+
+        .custom-card-header {
+            background-color: #999ce3 !important;
+            color: white !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
+        }
+
+        .custom-card-body {
+            background-color: #999ce3 !important;
+        }
+
+        /* Make sure tables inside custom cards have proper styling */
+        .custom-card .table {
+            background-color: white !important;
+        }
+
+        .custom-card .alert {
+            background-color: rgba(255, 255, 255, 0.9) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        }
+
         .table th {
             background-color: #343a40;
             color: white;

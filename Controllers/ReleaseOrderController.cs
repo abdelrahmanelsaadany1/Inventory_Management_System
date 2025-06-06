@@ -284,6 +284,36 @@ namespace Inventory_Management_System.Controllers
             }
         }
 
+        
+        [HttpGet]
+        public IActionResult GetProductsInWarehouse(int warehouseId)
+        {
+            var productsInWarehouse = _context.WarehouseProducts
+                .Where(wp => wp.WarehouseId == warehouseId)
+                .Include(wp => wp.Product)
+                .GroupBy(wp => new { wp.ProductId, wp.Product.Name }) 
+                .Select(g => new
+                {
+                    ProductId = g.Key.ProductId,
+                    Name = g.Key.Name,
+                    Quantity = g.Sum(wp => wp.Quantity) 
+                })
+                .OrderBy(p => p.Name) 
+                .ToList();
+
+            return Json(productsInWarehouse);
+        }
+
+        
+        [HttpGet]
+        public IActionResult GetProductQuantityInWarehouse(int productId, int warehouseId)
+        {
+            var totalQuantity = _context.WarehouseProducts
+                .Where(wp => wp.WarehouseId == warehouseId && wp.ProductId == productId)
+                .Sum(wp => (int?)wp.Quantity) ?? 0; 
+
+            return Json(totalQuantity);
+        }
 
         private void LoadDropdowns(AddReleaseOrderViewModel viewModel)
         {
@@ -297,7 +327,7 @@ namespace Inventory_Management_System.Controllers
             string prefix = "RO";
             string datePart = DateTime.Now.ToString("yyyyMMdd");
 
-            // Get the highest order number for today
+           
             string todayPrefix = $"{prefix}{datePart}";
             var existingOrders = _context.ReleaseOrders
                 .Where(r => r.OrderNumber.StartsWith(todayPrefix))
@@ -332,7 +362,5 @@ namespace Inventory_Management_System.Controllers
             }
             base.Dispose(disposing);
         }
-        //new
-
     }
 }

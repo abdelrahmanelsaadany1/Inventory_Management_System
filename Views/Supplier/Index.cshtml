@@ -15,21 +15,6 @@
                     </a>
                 </div>
                 <div class="card-body">
-                    <!-- Success/Error Messages -->
-                    @if (TempData["SuccessMessage"] != null)
-                    {
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    }
-                    @if (TempData["ErrorMessage"] != null)
-                    {
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    }
 
                     @if (!Model.Any())
                     {
@@ -124,8 +109,6 @@
                                 </tbody>
                             </table>
                         </div>
-
-                        <!-- Summary Info -->
                     }
                 </div>
                 <div class="card-footer text-end">
@@ -140,9 +123,6 @@
 
 @section Scripts {
     <script>
-        // Auto-dismiss alerts after 5 seconds
-        setTimeout(function() {
-            $('.alert').fadeOut('slow');
-        }, 5000);
+        // No alerts to dismiss
     </script>
 }
