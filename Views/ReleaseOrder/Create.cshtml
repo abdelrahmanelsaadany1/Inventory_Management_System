@@ -9,26 +9,22 @@
         background-color: #7d76cf !important;
     }
 
-    /* Custom styles for the buttons - KEEPING THE SHAPE CHANGE */
-    .btn.btn-primary,
-    .btn.btn-secondary {
-        border-radius: 10px; /* Adjust this value for more or less rounding */
+    .btn.btn-primary, .btn.btn-secondary {
+        border-radius: 10px;
     }
 
-    /* New styles for button placement */
     .button-group {
-        display: flex; /* Use flexbox for alignment */
-        justify-content: flex-start; /* Align items to the right */
-        gap: 10px; /* Space between buttons */
-        margin-top: 20px; /* Add some space above the buttons */
+        display: flex;
+        justify-content: flex-start;
+        gap: 10px;
+        margin-top: 20px;
     }
 
     .back-button-container {
-        margin-top: 15px; /* Space between action buttons and back button */
-        text-align: left; /* CHANGED: Align the back button to the LEFT */
+        margin-top: 15px;
+        text-align: left;
     }
 
-    /* Styles for the warehouse stock display */
     .warehouse-stock-display {
         margin-top: 20px;
         padding: 15px;
@@ -62,15 +58,6 @@
 
 <div asp-validation-summary="All" class="text-danger"></div>
 
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
-}
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
-}
-
 <form asp-action="@(Model.Id == 0 ? "Create" : "Edit")" method="post">
     @if (Model.Id != 0)
     {
@@ -97,14 +84,13 @@
         <span asp-validation-for="WarehouseId" class="text-danger"></span>
     </div>
 
-    @* NEW: Display area for selected warehouse's stock *@
+    <!-- Warehouse stock display -->
     <div class="warehouse-stock-display">
         <h4>Current Warehouse Stock:</h4>
         <div id="warehouse-stock-list">
             <p>Select a warehouse to see its stock.</p>
         </div>
     </div>
-    @* END NEW *@
 
     <div class="form-group">
         <label asp-for="SupplierId"></label>
@@ -149,12 +135,8 @@
     <div class="button-group">
         <button type="submit" class="btn btn-primary">Save</button>
         <a asp-action="Index" asp-controller="ReleaseOrder" class="btn btn-secondary">Back</a>
-       
     </div>
-
 </form>
-
-
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
@@ -186,15 +168,11 @@
             let tbody = button.closest("tbody");
             button.closest("tr").remove();
 
-            // Re-index remaining rows
-            let rows = tbody.querySelectorAll("tr");
-            rows.forEach((row, index) => {
-                row.querySelectorAll("select, input, span[data-valmsg-for]").forEach(element => {
-                    if (element.name) {
-                        element.name = element.name.replace(/\[\d+\]/, `[${index}]`);
-                    }
-                    if (element.hasAttribute("data-valmsg-for")) {
-                        element.setAttribute("data-valmsg-for", element.getAttribute("data-valmsg-for").replace(/\[\d+\]/, `[${index}]`));
+            tbody.querySelectorAll("tr").forEach((row, idx) => {
+                row.querySelectorAll("select, input, span[data-valmsg-for]").forEach(el => {
+                    if (el.name) el.name = el.name.replace(/\[\d+\]/, `[${idx}]`);
+                    if (el.hasAttribute("data-valmsg-for")) {
+                        el.setAttribute("data-valmsg-for", el.getAttribute("data-valmsg-for").replace(/\[\d+\]/, `[${idx}]`));
                     }
                 });
             });
@@ -202,80 +180,46 @@
 
         async function displayAvailableQuantity(selectElement) {
             const productId = selectElement.value;
-            const warehouseSelect = document.getElementById('WarehouseId');
-            const warehouseId = warehouseSelect.value;
-            const availableQuantitySpan = selectElement.closest('td').nextElementSibling.querySelector('.available-quantity');
+            const warehouseId = document.getElementById('WarehouseId').value;
+            const span = selectElement.closest('td').nextElementSibling.querySelector('.available-quantity');
 
             if (productId && warehouseId) {
                 try {
-                    const response = await fetch(`/ReleaseOrder/GetProductQuantityInWarehouse?productId=${productId}&warehouseId=${warehouseId}`);
-                    if (response.ok) {
-                        const quantity = await response.json();
-                        availableQuantitySpan.textContent = quantity;
-                    } else {
-                        availableQuantitySpan.textContent = 'N/A'; // Or handle error gracefully
-                    }
-                } catch (error) {
-                    console.error('Error fetching product quantity:', error);
-                    availableQuantitySpan.textContent = 'Error';
-                }
-            } else {
-                availableQuantitySpan.textContent = '0';
-            }
+                    const res = await fetch(`/ReleaseOrder/GetProductQuantityInWarehouse?productId=${productId}&warehouseId=${warehouseId}`);
+                    span.textContent = res.ok ? await res.json() : 'N/A';
+                } catch { span.textContent = 'Error'; }
+            } else { span.textContent = '0'; }
         }
 
-        // Function to load and display all products in the selected warehouse
         async function loadWarehouseProducts() {
             const warehouseId = document.getElementById('WarehouseId').value;
-            const warehouseStockListDiv = document.getElementById('warehouse-stock-list');
+            const stockDiv = document.getElementById('warehouse-stock-list');
 
             if (warehouseId) {
                 try {
-                    const response = await fetch(`/ReleaseOrder/GetProductsInWarehouse?warehouseId=${warehouseId}`);
-                    if (response.ok) {
-                        const products = await response.json();
-                        let html = '<ul>';
-                        if (products.length > 0) {
-                            products.forEach(p => {
-                                html += `<li><strong>${p.name}:</strong> ${p.quantity}</li>`;
-                            });
-                        } else {
-                            html += '<li>No products found in this warehouse.</li>';
-                        }
-                        html += '</ul>';
-                        warehouseStockListDiv.innerHTML = html;
-                    } else {
-                        warehouseStockListDiv.innerHTML = '<p class="text-danger">Error loading warehouse stock.</p>';
-                    }
-                } catch (error) {
-                    console.error('Error fetching warehouse products:', error);
-                    warehouseStockListDiv.innerHTML = '<p class="text-danger">Error loading warehouse stock.</p>';
+                    const res = await fetch(`/ReleaseOrder/GetProductsInWarehouse?warehouseId=${warehouseId}`);
+                    if (res.ok) {
+                        const products = await res.json();
+                        stockDiv.innerHTML = products.length
+                            ? '<ul>' + products.map(p => `<li><strong>${p.name}:</strong> ${p.quantity}</li>`).join('') + '</ul>'
+                            : '<ul><li>No products found in this warehouse.</li></ul>';
+                    } else { stockDiv.innerHTML = '<p class="text-danger">Error loading warehouse stock.</p>'; }
+                } catch {
+                    stockDiv.innerHTML = '<p class="text-danger">Error loading warehouse stock.</p>';
                 }
-            } else {
-                warehouseStockListDiv.innerHTML = '<p>Select a warehouse to see its stock.</p>';
-            }
+            } else { stockDiv.innerHTML = '<p>Select a warehouse to see its stock.</p>'; }
 
-        
-            document.querySelectorAll('.product-select').forEach(selectElement => {
-                displayAvailableQuantity(selectElement);
-            });
+            document.querySelectorAll('.product-select').forEach(displayAvailableQuantity);
         }
 
-
-      
-        document.getElementById('WarehouseId').addEventListener('change', function() {
-            loadWarehouseProducts(); 
-            document.querySelectorAll('.product-select').forEach(selectElement => {
-                displayAvailableQuantity(selectElement); 
-            });
+        document.getElementById('WarehouseId').addEventListener('change', () => {
+            loadWarehouseProducts();
+            document.querySelectorAll('.product-select').forEach(displayAvailableQuantity);
         });
 
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            loadWarehouseProducts(); 
-            document.querySelectorAll('.product-select').forEach(selectElement => {
-                displayAvailableQuantity(selectElement); 
-            });
+        document.addEventListener('DOMContentLoaded', () => {
+            loadWarehouseProducts();
+            document.querySelectorAll('.product-select').forEach(displayAvailableQuantity);
         });
     </script>
 }

@@ -6,30 +6,9 @@
 
 <h2>Supply Orders</h2>
 
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @TempData["SuccessMessage"]
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-}
-
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        @TempData["ErrorMessage"]
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-}
-
 <p>
-
     <div>
-        <a asp-action="Create" class="btn btn-primary"> Add New Supply Order</a>
+        <a asp-action="Create" class="btn btn-primary">Add New Supply Order</a>
         <a asp-action="Index" asp-controller="Home" class="btn btn-secondary ms-2">Back to Home</a>
     </div>
 </p>
@@ -55,32 +34,19 @@ else
                 <th>Production Date</th>
                 <th>Expiry Status</th>
                 <th>Created At</th>
-               
             </tr>
         </thead>
         <tbody>
             @foreach (var order in Model)
             {
                 <tr>
-                    <td>
-                        <strong>@order.Id</strong>
-                    </td>
-                    <td>
-                        <strong>@order.OrderNumber</strong>
-                    </td>
+                    <td><strong>@order.Id</strong></td>
+                    <td><strong>@order.OrderNumber</strong></td>
                     <td>@order.OrderDate.ToShortDateString()</td>
-                    <td>
-                        <span class="badge badge-info">@order.Warehouse?.Name</span>
-                    </td>
-                    <td>
-                        <span class="badge badge-secondary">@order.Supplier?.Name</span>
-                    </td>
-                    <td>
-                        <span class="badge badge-primary">@order.Items?.Count()</span>
-                    </td>
-                    <td>
-                        <span class="badge badge-success">@order.Items?.Sum(i => i.Quantity)</span>
-                    </td>
+                    <td><span class="badge badge-info">@order.Warehouse?.Name</span></td>
+                    <td><span class="badge badge-secondary">@order.Supplier?.Name</span></td>
+                    <td><span class="badge badge-primary">@order.Items?.Count()</span></td>
+                    <td><span class="badge badge-success">@order.Items?.Sum(i => i.Quantity)</span></td>
                     <td>
                         @if (order.Items?.Any() == true)
                         {
@@ -88,8 +54,7 @@ else
                             @earliestProduction.ToShortDateString()
                             @if (order.Items.Count() > 1)
                             {
-                                <br>
-
+                                <br />
                                 <small class="text-muted">(+ @(order.Items.Count() - 1) more)</small>
                             }
                         }
@@ -101,41 +66,37 @@ else
                     <td>
                         @if (order.Items?.Any() == true)
                         {
-                            var expiredCount = 0;
-                            var criticalCount = 0;
-                            var warningCount = 0;
-                            var goodCount = 0;
+                            var expired = 0;
+                            var critical = 0;
+                            var warning = 0;
+                            var good = 0;
 
                             foreach (var item in order.Items)
                             {
-                                var expectedExpiry = item.ProductionDate.AddDays(item.ExpiryPeriodInDays);
-                                var daysUntilExpiry = (expectedExpiry - DateTime.Today).Days;
+                                var expiry = item.ProductionDate.AddDays(item.ExpiryPeriodInDays);
+                                var days = (expiry - DateTime.Today).Days;
 
-                                if (daysUntilExpiry < 0)
-                                    expiredCount++;
-                                else if (daysUntilExpiry < 7)
-                                    criticalCount++;
-                                else if (daysUntilExpiry < 30)
-                                    warningCount++;
-                                else
-                                    goodCount++;
+                                if (days < 0) expired++;
+                                else if (days < 7) critical++;
+                                else if (days < 30) warning++;
+                                else good++;
                             }
 
-                            if (expiredCount > 0)
+                            if (expired > 0)
                             {
-                                <span class="badge badge-danger">@expiredCount Expired</span>
+                                <span class="badge badge-danger">@expired Expired</span>
                             }
-                            if (criticalCount > 0)
+                            if (critical > 0)
                             {
-                                <span class="badge badge-warning">@criticalCount Critical</span>
+                                <span class="badge badge-warning">@critical Critical</span>
                             }
-                            if (warningCount > 0)
+                            if (warning > 0)
                             {
-                                <span class="badge badge-warning">@warningCount Warning</span>
+                                <span class="badge badge-warning">@warning Warning</span>
                             }
-                            if (goodCount > 0)
+                            if (good > 0)
                             {
-                                <span class="badge badge-success">@goodCount Good</span>
+                                <span class="badge badge-success">@good Good</span>
                             }
                         }
                         else
@@ -143,14 +104,10 @@ else
                             <span class="text-muted">N/A</span>
                         }
                     </td>
-                    <td>
-                        @order.CreatedAt.ToString("dd/MM/yyyy HH:mm")
-                    </td>
-                  
+                    <td>@order.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
                 </tr>
             }
         </tbody>
-
     </table>
 }
 
@@ -187,10 +144,5 @@ else
             document.getElementById('deleteForm').action = '@Url.Action("Delete")/' + orderId;
             $('#deleteModal').modal('show');
         }
-
-        // Auto-hide alerts after 5 seconds
-        setTimeout(function() {
-            $('.alert').fadeOut();
-        }, 5000);
     </script>
 }

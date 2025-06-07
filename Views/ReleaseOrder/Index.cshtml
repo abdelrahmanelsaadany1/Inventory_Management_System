@@ -8,19 +8,10 @@
 
 <p>
     <div>
-    <a asp-action="Create" class="btn btn-primary">Create New Release Order</a>
-    <a asp-action="Index" asp-controller="Home" class="btn btn-secondary ms-2">Back to Home</a>
+        <a asp-action="Create" class="btn btn-primary">Create New Release Order</a>
+        <a asp-action="Index" asp-controller="Home" class="btn btn-secondary ms-2">Back to Home</a>
     </div>
 </p>
-
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
-}
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
-}
 
 <table class="table">
     <thead>
@@ -46,35 +37,19 @@
             <th>
                 @Html.DisplayNameFor(model => model.CreatedAt)
             </th>
-         
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model)
         {
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Id)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.OrderNumber)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.OrderDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Warehouse.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Supplier.Name)
-                </td>
-                <td>
-                    @item.Items.Count()
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CreatedAt)
-                </td>
-                
+                <td>@Html.DisplayFor(modelItem => item.Id)</td>
+                <td>@Html.DisplayFor(modelItem => item.OrderNumber)</td>
+                <td>@Html.DisplayFor(modelItem => item.OrderDate)</td>
+                <td>@Html.DisplayFor(modelItem => item.Warehouse.Name)</td>
+                <td>@Html.DisplayFor(modelItem => item.Supplier.Name)</td>
+                <td>@item.Items.Count()</td>
+                <td>@Html.DisplayFor(modelItem => item.CreatedAt)</td>
             </tr>
         }
     </tbody>

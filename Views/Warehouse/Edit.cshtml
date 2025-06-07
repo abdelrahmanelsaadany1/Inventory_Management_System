@@ -28,7 +28,27 @@
 
                             <div class="col-md-6 mb-3">
                                 <label asp-for="Address" class="form-label fw-bold">Address</label>
-                                <input asp-for="Address" class="form-control" />
+                                <select asp-for="Address" class="form-select" style="background-color: #999ce3; color: white;">
+                                    <option value="">-- Select a City --</option>
+                                    <option value="Cairo, Egypt">Cairo, Egypt</option>
+                                    <option value="Alexandria, Egypt">Alexandria, Egypt</option>
+                                    <option value="Giza, Egypt">Giza, Egypt</option>
+                                    <option value="Shubra El-Kheima, Egypt">Shubra El-Kheima, Egypt</option>
+                                    <option value="Port Said, Egypt">Port Said, Egypt</option>
+                                    <option value="Suez, Egypt">Suez, Egypt</option>
+                                    <option value="Luxor, Egypt">Luxor, Egypt</option>
+                                    <option value="Asyut, Egypt">Asyut, Egypt</option>
+                                    <option value="Mansoura, Egypt">Mansoura, Egypt</option>
+                                    <option value="Tanta, Egypt">Tanta, Egypt</option>
+                                    <option value="Aswan, Egypt">Aswan, Egypt</option>
+                                    <option value="Ismailia, Egypt">Ismailia, Egypt</option>
+                                    <option value="Faiyum, Egypt">Faiyum, Egypt</option>
+                                    <option value="Zagazig, Egypt">Zagazig, Egypt</option>
+                                    <option value="Damietta, Egypt">Damietta, Egypt</option>
+                                    <option value="Beni Suef, Egypt">Beni Suef, Egypt</option>
+                                    <!-- Add more if needed -->
+                                </select>
+
                                 <span asp-validation-for="Address" class="text-danger small"></span>
                             </div>
                         </div>

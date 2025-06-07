@@ -6,21 +6,14 @@
 
 <h2>Create Supply Order</h2>
 
-<!-- Add validation summary to see all errors -->
+<!-- Validation summary -->
 <div asp-validation-summary="All" class="text-danger"></div>
-
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
-}
 
 <form asp-action="Create" method="post">
     <div class="form-group">
         <label asp-for="OrderNumber"></label>
         <div class="input-group">
             <input asp-for="OrderNumber" class="form-control" id="orderNumberInput" />
-            <div class="input-group-append">
-            </div>
         </div>
         <span asp-validation-for="OrderNumber" class="text-danger"></span>
         <div id="orderNumberStatus" class="mt-1"></div>
@@ -98,7 +91,6 @@
     </div>
 
     <br />
-  
 </form>
 
 <style>
@@ -127,16 +119,9 @@
 </style>
 
 <script>
-    /* keep the same product list – switched to var per your preference */
     var productList = @Html.Raw(Json.Serialize(Model.Products));
     var checkTimeout;
 
-    /* ------------------------------------------------------------- */
-    /* 1) Generate-button code gone                                   */
-    /* 2) Event-listener for that button gone                         */
-    /* ------------------------------------------------------------- */
-
-    // Check order number availability
     function checkOrderNumber(orderNumber) {
         if (!orderNumber || orderNumber.trim() === '') {
             document.getElementById('orderNumberStatus').innerHTML = '';
@@ -183,17 +168,14 @@
         checkOrderNumber(suggestion);
     }
 
-    // Live-validate while typing
     document.getElementById('orderNumberInput')
             .addEventListener('input', function () { checkOrderNumber(this.value); });
 
-    // Auto-check if the field is pre-populated (edit mode)
     document.addEventListener('DOMContentLoaded', function () {
         var initialOrderNumber = document.getElementById('orderNumberInput').value;
         if (initialOrderNumber) checkOrderNumber(initialOrderNumber);
     });
 
-    /* ------------- table rows logic (unchanged, var instead of let) */
     function addRow() {
         var index = document.querySelectorAll('#items-table tbody tr').length;
         var row =
@@ -218,7 +200,6 @@
         var tbody = button.closest('tbody');
         button.closest('tr').remove();
 
-        /* Re-index */
         Array.from(tbody.querySelectorAll('tr')).forEach(function (row, idx) {
             Array.from(row.querySelectorAll('select, input')).forEach(function (el) {
                 if (el.name)
@@ -227,7 +208,6 @@
         });
     }
 
-    /* Debug – keep if helpful */
     document.querySelector('form')
             .addEventListener('submit', function () {
                 console.log('Form submitting...', new FormData(this));

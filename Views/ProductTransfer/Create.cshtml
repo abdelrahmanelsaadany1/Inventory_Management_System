@@ -15,12 +15,7 @@
                     <form asp-action="Create" id="transferForm">
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-                        @if (TempData["SuccessMessage"] != null)
-                        {
-                            <div class="alert alert-success">
-                                @TempData["SuccessMessage"]
-                            </div>
-                        }
+                   
 
                         <div class="row mb-3">
                             <div class="col-md-4">
@@ -378,7 +373,7 @@
 
         /* Make sure tables inside custom cards have proper styling */
         .custom-card .table {
-            background-color: white !important;
+            background-color: #999ce3 !important;
         }
 
         .custom-card .alert {
