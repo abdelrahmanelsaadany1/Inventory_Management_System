@@ -7,112 +7,421 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Inventory_Management_System.styles.css" asp-append-version="true" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <style>
+        /* Base Styles - Applied to the body and main containers */
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); /* Deep, rich purplish-blue gradient */
             min-height: 100vh;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Montserrat', sans-serif; /* Modern, clean font */
             margin: 0;
+            padding: 2rem; /* Adjusted padding */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            overflow-y: auto; /* Allow vertical scroll if content overflows */
         }
 
         .main-container {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.08); /* More transparent, subtle white */
+            backdrop-filter: blur(40px) saturate(180%); /* Stronger blur and saturation */
+            border-radius: 25px; /* Adjusted border-radius */
+            border: 1px solid rgba(255, 255, 255, 0.15); /* Thinner, lighter border */
             margin: 2rem auto;
-            max-width: 1200px;
-            padding: 2rem;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            max-width: 1300px; /* Increased max-width for content area */
+            padding: 2.5rem; /* Adjusted padding */
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3); /* Deeper shadow */
+            position: relative; /* For z-index and potential child positioning */
+            z-index: 2; /* Ensure content is above background elements */
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.5s ease;
         }
 
+            .main-container:hover {
+                transform: translateY(-5px); /* Slight lift on hover */
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            }
+
+        /* The .container class was used for centering in previous Home page,
+                   but now .main-container takes over the primary content wrapping.
+                   This .container style ensures the Bootstrap grid still works as expected. */
         .container {
-            max-width: none;
+            max-width: none; /* Allows Bootstrap's .container to expand fully within main-container */
+            padding: 0; /* Remove default bootstrap container padding within main-container */
         }
 
         main {
-            color: white;
+            color: #e0f2f7; /* Light cyan for main content text */
+            padding-bottom: 0; /* Ensure no extra padding from default pb-3 if not needed */
         }
 
+        /* Headings */
         h1, h2, h3, h4, h5, h6 {
-            color: white;
+            color: #b3e0ff; /* Lighter blue for all headings */
+            font-weight: 700; /* Make all headings bold */
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
+        /* Card styles - now used for generic cards within views */
         .card {
-            background: rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
+            border-radius: 15px; /* More rounded cards */
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease;
         }
 
+            .card:hover {
+                transform: translateY(-3px); /* Slight lift on hover */
+            }
+
+        /* Buttons (general, non-primary/secondary) */
         .btn:not(.btn-primary):not(.btn-secondary) {
-            background: rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.3);
+            background: rgba(255, 255, 255, 0.25); /* More visible background */
+            border: 1px solid rgba(255, 255, 255, 0.4); /* Stronger border */
             color: white;
+            font-weight: 600;
+            border-radius: 8px; /* Slightly rounded */
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            transition: all 0.3s ease;
+            .btn:not(.btn-primary):not(.btn-secondary):hover {
+                background: rgba(255, 255, 255, 0.35);
+                transform: translateY(-2px) scale(1.01);
+                color: white; /* Ensure text remains white on hover */
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            }
+
+        /* Primary Buttons - Using the teal-green gradient */
+        .btn-primary {
+            background: linear-gradient(135deg, #1abc9c, #16a085); /* Teal-green gradient */
+            box-shadow: 0 5px 20px rgba(26, 188, 156, 0.4);
+            color: white; /* Ensure text color for btn-primary */
+            font-weight: 600;
+            border: none; /* Remove default border */
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
+            .btn-primary:hover {
+                background: linear-gradient(135deg, #16a085, #1abc9c); /* Reverse gradient on hover */
+                transform: translateY(-3px) scale(1.02);
+                box-shadow: 0 8px 25px rgba(26, 188, 156, 0.5);
+                color: white;
+            }
+
+        /* Secondary Buttons - Using the amethyst purple gradient */
+        .btn-secondary {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad); /* Amethyst purple gradient */
+            box-shadow: 0 5px 20px rgba(155, 89, 182, 0.4);
+            color: white; /* Ensure text color for btn-secondary */
+            font-weight: 600;
+            border: none; /* Remove default border */
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+            .btn-secondary:hover {
+                background: linear-gradient(135deg, #8e44ad, #9b59b6); /* Reverse gradient on hover */
+                transform: translateY(-3px) scale(1.02);
+                box-shadow: 0 8px 25px rgba(155, 89, 182, 0.5);
+                color: white;
+            }
+
+        /* Table styles */
         .table {
-            background: rgba(255,255,255,0.1);
-            color: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.08); /* More subtle table background */
+            color: #e0f2f7; /* Light cyan text for table content */
+            border-radius: 15px; /* More rounded corners */
+            overflow: hidden; /* Ensures rounded corners apply to content */
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+            margin-top: 1.5rem; /* Add some space above tables */
         }
 
             .table th {
-                background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-                border-color: rgba(255,255,255,0.3);
+                background: linear-gradient(135deg, #3498db, #2980b9); /* Deeper blue for table headers */
+                border-color: rgba(255, 255, 255, 0.2);
                 color: white;
-                font-weight: 600;
-                padding: 1rem;
+                font-weight: 700; /* Bolder headers */
+                padding: 1.2rem 1rem; /* More padding */
                 border-top: none;
+                text-transform: uppercase; /* Uppercase headers */
+                font-size: 0.9em;
             }
 
             .table td {
-                color:white;
-                border-color: rgba(255,255,255,0.1);
-                padding: 0.75rem 1rem;
+                color: #e0f2f7; /* Consistent light cyan text for table cells */
+                border-color: rgba(255, 255, 255, 0.08); /* Lighter border between cells */
+                padding: 0.9rem 1rem;
                 vertical-align: middle;
             }
 
             .table tbody tr {
-                background: rgba(255,255,255,0.1);
                 transition: all 0.3s ease;
             }
 
                 .table tbody tr:hover {
-                    background: rgba(255,255,255,0.15);
-                    transform: scale(1.01);
+                    background: rgba(255, 255, 255, 0.12); /* Slightly more opaque on hover */
+                    transform: scale(1.005); /* Very slight scale on hover */
+                    box-shadow: inset 0 0 10px rgba(0,0,0,0.1); /* Subtle inner shadow */
                 }
 
+        /* Form Controls */
         .form-control {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.3);
-            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #e0f2f7; /* Light cyan text for input */
+            border-radius: 8px; /* More rounded inputs */
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
         }
 
             .form-control:focus {
-                background: rgba(255,255,255,0.15);
-                border-color: rgba(255,255,255,0.5);
-                color: white;
-                box-shadow: 0 0 0 0.2rem rgba(255,255,255,0.25);
+                background: rgba(255, 255, 255, 0.18); /* Slightly more opaque on focus */
+                border-color: rgba(255, 255, 255, 0.6); /* Stronger border on focus */
+                color: #e0f2f7;
+                box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.35); /* Stronger shadow on focus */
+                outline: none; /* Remove default outline */
             }
 
             .form-control::placeholder {
-                color: rgba(255,255,255,0.7);
+                color: rgba(224, 242, 247, 0.6); /* Light cyan placeholder */
             }
 
         .form-label {
-            color: white;
+            color: #b3e0ff; /* Lighter blue for labels */
+            font-weight: 500;
+            margin-bottom: 0.5rem; /* Space between label and input */
+        }
+
+        /* Floating background elements */
+        .float-shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.03);
+            filter: blur(12px); /* Slightly less blur */
+            opacity: 0.7; /* Slightly less opaque */
+            animation: float 25s infinite ease-in-out alternate;
+            pointer-events: none; /* Ensure they don't block interaction */
+            z-index: 1; /* Keep them behind content */
+        }
+
+        .shape-1 {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            top: 5%;
+            left: 5%;
+            animation-duration: 30s;
+        }
+
+        .shape-2 {
+            width: 160px;
+            height: 160px;
+            border-radius: 40% 60% 70% 30% / 60% 40% 40% 60%;
+            bottom: 8%;
+            right: 8%;
+            animation-duration: 28s;
+            animation-delay: 2s;
+        }
+
+        .shape-3 {
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            top: -8%;
+            right: 10%;
+            animation-duration: 35s;
+            animation-delay: 4s;
+        }
+
+        .shape-4 {
+            width: 100px;
+            height: 100px;
+            border-radius: 30% 70% 50% 50% / 50% 50% 70% 30%;
+            bottom: 5%;
+            left: 15%;
+            animation-duration: 20s;
+            animation-delay: 1s;
+        }
+
+        /* Keyframes for floating animation */
+        @@keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            50% {
+                transform: translate(20px, 40px) rotate(10deg);
+            }
+
+            100% {
+                transform: translate(-10px, -20px) rotate(0deg);
+            }
+        }
+
+        /* Media Queries for Responsiveness */
+        @@media (max-width: 1024px) {
+            /* General adjustments for larger tablets and small desktops */
+            body {
+                padding: 1.5rem;
+            }
+
+            .main-container {
+                margin: 1.5rem auto;
+                padding: 2rem;
+            }
+
+            h1 {
+                font-size: 3.5rem;
+            }
+
+            .subtitle {
+                font-size: 1.3rem;
+            }
+
+            .card {
+                padding: 1.8rem;
+            }
+
+                .card h2 {
+                    font-size: 1.5rem;
+                }
+
+            .btn {
+                padding: 1rem 0.8rem;
+                font-size: 0.95em;
+            }
+
+            .table th, .table td {
+                padding: 1rem 0.8rem;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            /* Adjustments for tablets and medium mobile views */
+            body {
+                padding: 1rem;
+                align-items: flex-start; /* Align to top to allow scrolling */
+            }
+
+            .main-container {
+                margin: 1rem auto;
+                padding: 1.5rem;
+                border-radius: 15px;
+            }
+
+            h1 {
+                font-size: 2.8rem;
+                letter-spacing: 0.04em;
+            }
+
+            .subtitle {
+                font-size: 1.1rem;
+                margin-bottom: 2.5rem;
+            }
+
+            .grid { /* If you re-introduce a grid like the home page, this will apply */
+                grid-template-columns: 1fr; /* Stack cards vertically */
+                gap: 1rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+                border-radius: 12px;
+            }
+
+                .card h2 {
+                    font-size: 1.3rem;
+                    margin-bottom: 1rem;
+                    gap: 0.6rem;
+                }
+
+            .icon {
+                width: 28px;
+                height: 28px;
+                font-size: 16px;
+            }
+
+            .btn-grid { /* If you re-introduce a button grid, this will apply */
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 0.8rem;
+            }
+
+            .btn {
+                padding: 0.8rem 0.6rem;
+                font-size: 0.9em;
+                border-radius: 10px;
+            }
+
+            .table th, .table td {
+                padding: 0.8rem 0.6rem;
+                font-size: 0.9em;
+            }
+            /* Hide some floating shapes on smaller screens to reduce clutter */
+            .shape-3, .shape-4 {
+                display: none;
+            }
+        }
+
+        @@media (max-width: 480px) {
+            /* Adjustments for small mobile devices */
+            body {
+                padding: 0.5rem;
+            }
+
+            .main-container {
+                margin: 0.5rem auto;
+                padding: 1rem;
+                border-radius: 10px;
+            }
+
+            h1 {
+                font-size: 2rem;
+                margin-bottom: 0.2rem;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .card {
+                padding: 1.2rem;
+            }
+
+                .card h2 {
+                    font-size: 1.1rem;
+                    gap: 0.4rem;
+                }
+
+            .icon {
+                width: 24px;
+                height: 24px;
+                font-size: 14px;
+            }
+
+            .btn {
+                padding: 0.7rem;
+                font-size: 0.8em;
+            }
+
+            .table th, .table td {
+                padding: 0.6rem;
+                font-size: 0.8em;
+            }
+            /* Hide all floating shapes on very small screens */
+            .float-shape {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="float-shape shape-1"></div>
+    <div class="float-shape shape-2"></div>
+    <div class="float-shape shape-3"></div>
+    <div class="float-shape shape-4"></div>
+
     <div class="container">
         <div class="main-container">
             <main role="main" class="pb-3">
